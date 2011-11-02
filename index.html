@@ -228,7 +228,7 @@ new function () {
                 this.libcanvas.getAudio('explosion').play();
 
             } else {
-            	if (this._type == 'nark') {
+                if (this._type == 'nark') {
                     
                     this.libcanvas.ctx.drawImage({
                         image : this.libcanvas.getImage('nark'),
@@ -255,7 +255,7 @@ new function () {
             }
             
 
-            	
+                
         }
     });
     
@@ -300,12 +300,12 @@ new function () {
         },
         
         isTroubled: function (pos) {
-        	if(pos[0] <= this._pos[0]+64 && pos[0] >= this._pos[0]-64
-        			&& pos[1] <= this._pos[1]+64 && pos[1] >= this._pos[1]-64){
-        		return true;
-        	} else {
-        		return false;
-        	}
+            if(pos[0] <= this._pos[0]+64 && pos[0] >= this._pos[0]-64
+                    && pos[1] <= this._pos[1]+64 && pos[1] >= this._pos[1]-64){
+                return true;
+            } else {
+                return false;
+            }
         },
 
         draw : function () {
@@ -316,6 +316,95 @@ new function () {
                 if(
                     this.animation.run({
                         line : Array.range(0,319),
+                        delay: 40,
+                        loop : true
+                    }) ) {
+                    this.libcanvas.ctx.drawImage({
+                        image : this.animation.sprite,
+                        center: this._pos,
+                    });
+                }
+            }
+        }
+    });
+    var Asteroid = atom.Class({
+        position : null,
+
+        Extends : LibCanvas.Scene.Element,
+        Implements: [
+            Draggable, Clickable
+        ],
+        animation: null,
+        
+        
+        initialize : function (canvasSize) {
+
+            this._endPos = [0, canvasSize.y];
+            this._speed = 10;
+            this._fly = false;
+            this._pos = [canvasSize.x, 0];
+            this._dx = this._speed * canvasSize.x / Math.sqrt(canvasSize.x * canvasSize.x + canvasSize.y * canvasSize.y);
+            this._dy = this._speed * canvasSize.y / Math.sqrt(canvasSize.x * canvasSize.x + canvasSize.y * canvasSize.y);
+            
+            console.log(this._pos , this._startPos);
+            //this._boom = false;
+            this._type = 'asteroid';
+
+            this.addEvent('libcanvasSet', function () {
+                this.animation = new LibCanvas.Animation.Sprite()
+                    .addSprites(this.libcanvas.getImage('asteroid'), 48);
+            
+            }); 
+        },
+        
+        get pos () {
+            return this._pos;
+        },
+        set pos (value) {
+            this._pos = value;
+        },
+        
+        get fly () {
+            return this._fly;
+        },
+        set fly (value) {
+            this._fly = value;
+        },
+        
+        set boom (value) {
+            this._boom = value;
+        },
+        get type () {
+            return this._type;
+        },
+        set type (value) {
+            this._type = value;
+        },
+        
+        isImpact: function (pos) {
+            if(pos[0] <= this._pos[0]+48 && pos[0] >= this._pos[0]-48
+                    && pos[1] <= this._pos[1]+48 && pos[1] >= this._pos[1]-48){
+                return true;
+            } else {
+                return false;
+            }
+        },
+
+        draw : function () {
+            
+            if(!play || !this.fly){
+                return;
+            }
+            if(this._endPos[0] > this._pos[0] || this._endPos[1] < this._pos[1]){
+                this._pos = [canvasSize.x, 0];
+            } else {
+                this.pos[0] -= this._dx;
+                this.pos[1] += this._dy;
+            }
+            if (this._type == 'asteroid') {
+                if (
+                    this.animation.run({
+                        line : Array.range(0,99),
                         delay: 40,
                         loop : true
                     }) ) {
@@ -357,18 +446,18 @@ new function () {
             this._structure = value;
         },
         draw: function () {
-        	
-        	if (this._time < 10 || (this._structure && this._structure < 30)) {
-        		this._color = '#ff0000';
-        	} else if (this._time < 20 || (this._structure && this._structure < 75)) {
-        		this._color = '#ffff00';
-        	} else {
-        		this._color = '#00ffff';
-        	}
-        	var structurLabel = '';
-        	if (this._structure) {
-        		structurLabel = '\nStructure: ' + this._structure;
-        	}
+            
+            if (this._time < 10 || (this._structure && this._structure < 30)) {
+                this._color = '#ff0000';
+            } else if (this._time < 20 || (this._structure && this._structure < 75)) {
+                this._color = '#ffff00';
+            } else {
+                this._color = '#00ffff';
+            }
+            var structurLabel = '';
+            if (this._structure) {
+                structurLabel = '\nStructure: ' + this._structure;
+            }
             this.libcanvas.ctx.text({ 
                 text: this.text + this._num + '\nTime: ' + this._time + structurLabel,
                 color: this._color
@@ -378,13 +467,13 @@ new function () {
     
     
     var Dialog = atom.Class({
-    	Extends : LibCanvas.Scene.Element,
+        Extends : LibCanvas.Scene.Element,
         Implements: [
             Draggable, Clickable
         ],
         initialize: function (canvas, options) {
-        	console.log(options.length);
-        	this._options = options;
+            console.log(options.length);
+            this._options = options;
             this._displayTv = false;
             this._canvas = this.libcanvas;
 
@@ -396,7 +485,7 @@ new function () {
             }
             
             if (!this._displayTv) {
-            	this.tv = this._canvas.getImage('dialogBadTv');
+                this.tv = this._canvas.getImage('dialogBadTv');
             }
             
             this.image = this._canvas.getImage('dialog');
@@ -424,8 +513,8 @@ new function () {
         },
 
         draw: function () {
-        	this.image
-        	&& this.dispatcher.run({
+            this.image
+            && this.dispatcher.run({
                 line : Array.range(0,9),
                 delay: 80,
                 repeat: 1,
@@ -448,14 +537,14 @@ new function () {
             })
             
             && this._canvas.ctx.text({
-            	text : this._proposition,
-            	color : '#333333',
-            	to: [20, 100, this.imgWidth-50, this.imgHeight],
-            	size : 14,
-            	style : 'italic',
-            	//padding : [100, 15],
-            	align : 'left',
-            	//wrap : 'no',
+                text : this._proposition,
+                color : '#333333',
+                to: [20, 100, this.imgWidth-50, this.imgHeight],
+                size : 14,
+                style : 'italic',
+                //padding : [100, 15],
+                align : 'left',
+                //wrap : 'no',
             })
             
         }
@@ -467,16 +556,16 @@ new function () {
             Draggable, Clickable
         ],
         initialize: function (canvas, options) {
-        	this._text = options.text;
-        	this._color = '#333333';
-        	this._position = options.position;
-        	this._style = 'italic';
+            this._text = options.text;
+            this._color = '#333333';
+            this._position = options.position;
+            this._style = 'italic';
             
-        	this._textSize = 12;
-        	this._shape = new Rectangle(this._position);
-        	this.shape = this._shape;
-        	
-        	this._display = true;
+            this._textSize = 12;
+            this._shape = new Rectangle(this._position);
+            this.shape = this._shape;
+            
+            this._display = true;
 
             this._canvas = this.libcanvas;
 
@@ -497,14 +586,14 @@ new function () {
         set display (value) {
             this._display = value;
             if (!value) {
-            	this.shape = new Rectangle(0,0,0,0);
+                this.shape = new Rectangle(0,0,0,0);
             }
         },
         
 
         draw: function () {
-        	if(this._display){
-        		this._canvas.ctx.fill(new Rectangle(this._position), '#aac3cb');
+            if(this._display){
+                this._canvas.ctx.fill(new Rectangle(this._position), '#aac3cb');
                 this._canvas.ctx.text({
                         text : this._text,
                         color : this._color,
@@ -515,8 +604,8 @@ new function () {
                         //align : 'left',
                         //wrap : 'no',
                     });
-        	}
-        	
+            }
+            
         }
     });
     
@@ -527,21 +616,22 @@ new function () {
         fps: 24,
         //invoke: true,
         preloadImages: {
-            test: 'fiew.png',
-            cistern: 'cistern.png',
-            des: 'des.png',
-            background: '1bg.png',
-            dialog: '2BG.png',
-            dialogBadTv: '2TV.png',
-            dispatcher: 'signal.png',
-            nark: '1GOODS8.png',
-            hedgehog: 'hedgehog.png'
+            test: 'images/fiew.png',
+            cistern: 'images/cistern.png',
+            des: 'images/des.png',
+            background: 'images/1bg.png',
+            dialog: 'images/2BG.png',
+            dialogBadTv: 'images/2TV.png',
+            dispatcher: 'images/signal.png',
+            nark: 'images/1GOODS8.png',
+            hedgehog: 'images/hedgehog.png',
+            asteroid: 'images/asteroid.png'
             
         },
         preloadAudio: {
             //shot    : files + 'sounds/shot.*',
-            explosion : 'EXPL2.*',
-            buy: 'buy.*'
+            explosion : 'sounds/EXPL2.*',
+            buy: 'sounds/buy.*'
         }
     })
     .size(canvasSize.x, canvasSize.y, true)
@@ -588,9 +678,12 @@ new function () {
         
         var cistern = new Cistern([-100, -100]);
         var trouble = new Trouble([-100, -100]);
+        var asteroid = new Asteroid(canvasSize);
+        
         
         libcanvas.addElement(cistern);
         libcanvas.addElement(trouble);
+        libcanvas.addElement(asteroid);
         
 
         /*var Item = atom.Class({
@@ -614,20 +707,20 @@ new function () {
         
 
         function ignore(){
-        	console.log('iii');
-        	drawDialog('Пшол вон!', []);
-        	var drawOptions = [
-        	    {
-        	    	text: ' - Ладно, Полетели!',
-        	        method : start,
-        	    },
-        	];
-        	drawDialog('  Пшол вон!', drawOptions);
+            console.log('iii');
+            drawDialog('Пшол вон!', []);
+            var drawOptions = [
+                {
+                    text: ' - Ладно, Полетели!',
+                    method : start,
+                },
+            ];
+            drawDialog('  Пшол вон!', drawOptions);
         }
         
         function start(){
-        	//cistern.type = cistern.nextType;
-        	console.log('no');
+            //cistern.type = cistern.nextType;
+            console.log('no');
             dialogLayer.hide();
             answersLayer.hide();
             ///////////////////////////////
@@ -638,7 +731,7 @@ new function () {
             trouble.pos = [Number.random(50, canvasSize.x-50), Number.random(50, canvasSize.y-50)];
             
             if (p == 0 || !exp.moving) {
-            	//console.log('restarted');
+                //console.log('restarted');
                 p = 0;
                 //topLayer.ctx.clearAll();
                 //or  libcanvas.layer('front').ctx.clearAll()
@@ -646,11 +739,13 @@ new function () {
 
                     libcanvas.addElement(cistern);
                     if(cistern.type == 'nark'){
-                    	
-                    	
+                        
+                        
                     }
                     
                     cistern.pos = [Number.random(50, canvasSize.x-50), Number.random(50, canvasSize.y-50)];
+                    //asteroid.pos = [Number.random(50, canvasSize.x-50), Number.random(50, canvasSize.y-50)];
+                    asteroid.fly = true;
                     run();
                     exp.moving = true;
                 } , 1000);
@@ -663,8 +758,8 @@ new function () {
         }
 
         function instruct(){
-        	//console.log('jjjj');
-        	var drawOptions = [
+            //console.log('jjjj');
+            var drawOptions = [
                 {
                     text: ' - Мне нужен иструктаж!',
                     method : ignore,
@@ -674,11 +769,11 @@ new function () {
                     method: anekdot,
                 },
                 {
-                	text: ' - Полетели!',
-                	method : start,
+                    text: ' - Полетели!',
+                    method : start,
                 },
             ];
-        	drawDialog('  Тебе, что делать нечего?', drawOptions);
+            drawDialog('  Тебе, что делать нечего?', drawOptions);
         }
         
         var dialogs = new Dialog(dialogLayer, []);
@@ -801,11 +896,11 @@ new function () {
             quote[82] = "Если мне наплевать, это ещё не значит, что я не понимаю."
             quote[83] = "Так выпьем же за алкоголь — источник и решение всех наших проблем!"
             quote[84] = "Почему? Потому, Барт, что я целовал лишь одну девчонку? Все равно на одну больше чем ты."
-        	
-            	var anekdot = '  Ну вот, слушай: \n\n';
+            
+                var anekdot = '  Ну вот, слушай: \n\n';
                 anekdot += quote[Math.floor(Math.random() * (84 + 1))];
-            		
-            	drawDialog(anekdot, drawOptions);
+                    
+                drawDialog(anekdot, drawOptions);
         }
 
         var drawOptions = [
@@ -829,21 +924,21 @@ new function () {
         
         
             function drawDialog(quastion, answersOptions) {
-            	answersLayer.ctx.clearAll();
-            	dialogs.proposition = quastion;
-            	var an0, an1, an2, an3 = null;
-            	if (answersOptions[0]) {
-            		answersOptions[0].position = [20, 320, 300, 25];
-            		
-            		   var an0 = new Answer(answersLayer, answersOptions[0])
-            		        .listenMouse()
+                answersLayer.ctx.clearAll();
+                dialogs.proposition = quastion;
+                var an0, an1, an2, an3 = null;
+                if (answersOptions[0]) {
+                    answersOptions[0].position = [20, 320, 300, 25];
+                    
+                       var an0 = new Answer(answersLayer, answersOptions[0])
+                            .listenMouse()
                             .addEvent('click', function () {
                                 answersOptions[0].method();
                                 if(an0){
-                                	an0.removeEvent('click');
-                                	an0.removeEvent('mouseover');
-                                	an0.removeEvent('mouseout');
-                                	an0.display = false;
+                                    an0.removeEvent('click');
+                                    an0.removeEvent('mouseover');
+                                    an0.removeEvent('mouseout');
+                                    an0.display = false;
                                 }
                                 if(an1){
                                     an1.removeEvent('click');
@@ -871,8 +966,8 @@ new function () {
                                 dialogOut(this);
                             })
                     libcanvas.addElement(an0);
-            	}
-            	if (answersOptions[1]) {
+                }
+                if (answersOptions[1]) {
                     answersOptions[1].position = [20, 345, 300, 25];
                     
                       var an1 =  new Answer(answersLayer, answersOptions[1])
@@ -915,7 +1010,7 @@ new function () {
                             })
                     libcanvas.addElement(an1);
                 }
-            	if (answersOptions[2]) {
+                if (answersOptions[2]) {
                     answersOptions[2].position = [20, 370, 300, 25];
                     
                       var an2 =  new Answer(answersLayer, answersOptions[2])
@@ -974,17 +1069,18 @@ new function () {
             }
         
         function run(){
-        	cistern.boom = false;
+            cistern.boom = false;
             interval = setInterval( function() {
                 cCisterns.time = --p;
                 if (p <= 0) {
-                	//cistern.pos = [-100, -100];
+                    //cistern.pos = [-100, -100];
                     end();
                 }
             } , 1000);
         }
         
         function end(){
+            asteroid.fly = false;
             clearInterval(interval);
 
             var drawOptions = [
@@ -1000,15 +1096,15 @@ new function () {
             var dialog = '  Мда, слабовато. Ты набрал всего лишь ' + cCisterns.num + ' очков!';
             dialog += '\n  Пробуй ещё, салага!';
             if (cCisterns.num > 15 && cistern.type == 'cistern') {
-            	
-            	dialog = '  Мда, слабовато. Ты набрал всего лишь ' + cCisterns.num + ' очков! Ех, была не была, готовся к следующему заданию.';
-            	dialog += '\n  Один наш "друг" не осилел доставку очень важного для нас товара. Видать его подбили и всё наше добро высыпалось в космос.';
-            	dialog += '\n  Ну я думаю ты уже догадался, что ты будеш собирать. Кхе-кхе-хе.';
-            	cistern.type = 'nark';
-            	exp.structure = 200;
-            	
+                
+                dialog = '  Мда, слабовато. Ты набрал всего лишь ' + cCisterns.num + ' очков! Ех, была не была, готовся к следующему заданию.';
+                dialog += '\n  Один наш "друг" не осилел доставку очень важного для нас товара. Видать его подбили и всё наше добро высыпалось в космос.';
+                dialog += '\n  Ну я думаю ты уже догадался, что ты будеш собирать. Кхе-кхе-хе.';
+                cistern.type = 'nark';
+                exp.structure = 200;
+                
             } else if(cCisterns.num > 30 && cistern.type == 'nark') {
-            	dialog = '  Мда, слабовато. Ты набрал всего лишь ' + cCisterns.num + ' очков! Думаю, ты всё ещё сможеш собрать больше товара...';
+                dialog = '  Мда, слабовато. Ты набрал всего лишь ' + cCisterns.num + ' очков! Думаю, ты всё ещё сможеш собрать больше товара...';
             }
             drawDialog(dialog, drawOptions);
             exp.moving = false;
@@ -1022,7 +1118,7 @@ new function () {
         libcanvas.addFunc(function () {
             if (play) {
                 if(this.getKey('aleft') && this.getKey('adown')){
-                	if (exp.angle == 0) {
+                    if (exp.angle == 0) {
                         exp.angle = 360;
                     }
                     exp.angle += 10;
@@ -1035,7 +1131,7 @@ new function () {
                     }
                     exp.angle -= 10;
                     if (speed < forwardSpeed) {
-                    	forwardSpeed--;
+                        forwardSpeed--;
                     }
                     
                 } 
@@ -1049,7 +1145,7 @@ new function () {
                         forwardSpeed--;
                     }
                 } else if(this.getKey('aright')){
-                	if (exp.angle == 360) {
+                    if (exp.angle == 360) {
                         exp.angle = 0;
                     }
                     exp.angle += 10;
@@ -1058,7 +1154,7 @@ new function () {
                     }
                 }
                 if (this.getKey('aup')) {
-                	if (forwardSpeed < maxForwardSpeed) {
+                    if (forwardSpeed < maxForwardSpeed) {
                         forwardSpeed++;
                     }
                     if (exp.angle < 90) {
@@ -1079,7 +1175,7 @@ new function () {
                     }
                 } 
                 if (this.getKey('adown' )) {
-                	forwardSpeed = speed;
+                    forwardSpeed = speed;
                     if (exp.angle < 90) {
                         exp.x = exp.x - backSpeed * Math.sin((exp.angle).degree());
                         exp.y = exp.y + backSpeed * Math.sin((90-exp.angle).degree());
@@ -1105,17 +1201,17 @@ new function () {
                     cistern.pos = [Number.random(40, canvasSize.x-40), Number.random(40, canvasSize.y-40)];
                 }
                 if(trouble.isTroubled([exp.x,exp.y])){
-                	if (exp.structure == 0) {
-                		trouble.pos = [-100, -100];
-                		cistern.pos = [-100, -100];
+                    if (exp.structure == 0) {
+                        trouble.pos = [-100, -100];
+                        cistern.pos = [-100, -100];
                         end();
                     } else {
-                    	//console.log('trable');
+                        //console.log('trable');
                         exp.structure -=1;
                         cCisterns.structure = exp.structure;
                     }
-                	
-                	
+                    
+                    
                 }
                 this.update();
             } 
