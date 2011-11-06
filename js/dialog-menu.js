@@ -10,7 +10,6 @@
             Draggable, Clickable
         ],
         initialize: function (canvas, options) {
-            //console.log(options.length);
             this._options = options;
             this._displayTv = false;
             this._canvas = this.libcanvas;
@@ -40,7 +39,6 @@
             this.tTopMargin = 10 / k;
             this.shape = new Rectangle(0, 0, this.imgWidth, this.imgHeight);
 
-          //  this.dispatcher = this._canvas.getImage('dispatcher');
             this.dispatcher = new LibCanvas.Animation.Sprite()
             .addSprites(this._canvas.getImage('dispatcher'), 222);
 
@@ -63,11 +61,6 @@
                 //from : [this.tvLeftMargin, this.tTopMargin],
                 draw : [this.tvLeftMargin, this.tTopMargin, this.tvWidth, this.tvHeight]
             })
-            /*&& this._canvas.ctx.drawImage({
-                image : this.tv,
-                //from : [0,0],
-                draw : [this.tvLeftMargin, this.tTopMargin, this.tvWidth, this.tvHeight]
-            })*/
             && this._canvas.ctx.drawImage({
                 image : this.image,
                 //from : [0,0],
@@ -84,7 +77,6 @@
                 align : 'left'
                 //wrap : 'no',
             })
-
         }
     });
 
@@ -110,8 +102,6 @@
             if (canvas) {
                 this._canvas = canvas;
             }
-
-
         },
 
         set style (value) {
@@ -130,7 +120,7 @@
 
 
         draw: function () {
-            if(this._display){
+            if (this._display){
                 this._canvas.ctx.fill(new Rectangle(this._position), '#aac3cb');
                 this._canvas.ctx.text({
                         text : this._text,
@@ -141,8 +131,7 @@
                         //padding : [this._paddingTop, 0],
                         //align : 'left',
                         //wrap : 'no',
-                    });
+                });
             }
-
         }
     });

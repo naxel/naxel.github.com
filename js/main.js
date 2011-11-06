@@ -23,19 +23,12 @@ var timeOnLevel = parseInt(((canvasSize.x * canvasSize.y)/10000) + speed, 10);
 
 atom.dom(function () {
 
-
-
     var startText = '  Здраствуйте.\n  Вы находитесь на военной базе "Глаз Быка".\n\n';
     startText += '  К нам прибыли рекомендации с академии, где вы показали не плохие результаты.';
     startText += 'Но мы хотели бы убедится, так ли вы хороши, как описаны в этих бумажках.';
     startText += '\n  Мы вам выдаем корабль без вооружения, и с блокиратором двигателя, т.е. вам не удастся покинуть зону радара.';
     startText += '\n  Ваше первое задание ... ну, скажем, собрать космический мусор, пока мы не погрязли в отходах.';
     startText += '\n  Так что, салага -- в ангар!';
-
-
-
-
-
 
 
     var Cistern = atom.Class({
@@ -62,7 +55,6 @@ atom.dom(function () {
 
                 this.destruction = new LibCanvas.Animation.Sprite()
                     .addSprites(this.libcanvas.getImage('des'), 144);
-
             });
         },
 
@@ -82,15 +74,9 @@ atom.dom(function () {
         set type (value) {
             this._type = value;
         },
-        /*get nextType () {
-            return this._nextType;
-        },
-        set nextType (value) {
-            this._nextType = value;
-        },*/
 
         draw : function () {
-            if(!play){
+            if (!play){
                 return;
             }
             if (this._boom ) {
@@ -122,8 +108,8 @@ atom.dom(function () {
                         //angle: (this._angle).degree()//this._angle
                     });
 
-                } else if(this._type == 'cistern') {
-                    if(
+                } else if (this._type == 'cistern') {
+                    if (
                         this.animation.run({
                             line : Array.range(0,96),
                             delay: 40,
@@ -138,9 +124,6 @@ atom.dom(function () {
                     }
                 }
             }
-
-
-
         }
     });
 
@@ -209,38 +192,16 @@ atom.dom(function () {
 
         },
         preloadAudio: {
-            //shot    : files + 'sounds/shot.*',
             explosion : 'sounds/EXPL2.*',
             buy: 'sounds/buy.*'
         }
     })
     .size(canvasSize.x, canvasSize.y, true)
     .listenMouse()
-    .addEvent( 'ready', function () {
-
-    })
     .start(function () {
         //this.ctx.drawImage( this.getImage('test') );
     })
     .addEvent('ready', function () {
-
-
-        /*libcanvas.createShaper({
-            shape: new Circle( 500, 100, 20 ),
-            fill : 'red',
-            // меняем стиль круга при наведении
-            hover: {
-                fill  : 'black',
-                stroke: 'red'
-            },
-        })
-        .clickable()
-        .draggable()
-        .animate({
-            time : 5000,
-            props: { 'shape.radius': 50 },
-            onProcess: libcanvas.update
-        });*/
 
         var p = timeOnLevel;
 
@@ -265,17 +226,6 @@ atom.dom(function () {
         libcanvas.addElement(trouble);
         libcanvas.addElement(asteroid);
 
-
-        /*var Item = atom.Class({
-            Implements: [ Drawable, Clickable ],
-            initialize: function () {
-                this.shape = new Rectangle(70, 0, 50, 20);
-            },
-            draw: function () {
-                this.libcanvas.ctx.fill( this.shape, 'green' );
-            }
-        });*/
-
         var cCisterns = new CountCisterns("Score: ", p);
         libcanvas.addElement(cCisterns);
 
@@ -287,7 +237,6 @@ atom.dom(function () {
 
 
         function ignore(){
-            //console.log('iii');
             drawDialog('Пшол вон!', []);
             var drawOptions = [
                 {
@@ -299,8 +248,6 @@ atom.dom(function () {
         }
 
         function start(){
-            //cistern.type = cistern.nextType;
-            //console.log('no');
             dialogLayer.hide();
             answersLayer.hide();
             ///////////////////////////////
@@ -318,20 +265,16 @@ atom.dom(function () {
             trouble.pos = [Number.random(50, canvasSize.x-50), Number.random(50, canvasSize.y-50)];
 
             if (p == 0 || !ship.moving) {
-                //console.log('restarted');
                 p = 0;
                 //topLayer.ctx.clearAll();
                 //or  libcanvas.layer('front').ctx.clearAll()
                 setTimeout( function() {
 
                     libcanvas.addElement(cistern);
-                    if(cistern.type == 'nark'){
-
+                    if (cistern.type == 'nark') {
 
                     }
-
                     cistern.pos = [Number.random(50, canvasSize.x-50), Number.random(50, canvasSize.y-50)];
-                    //asteroid.pos = [Number.random(50, canvasSize.x-50), Number.random(50, canvasSize.y-50)];
                     asteroid.fly = true;
                     run();
                     ship.moving = true;
@@ -340,7 +283,6 @@ atom.dom(function () {
             }
             p = timeOnLevel;
             cCisterns.time = p;
-            //console.log('started');
             //////////////////////////////
         }
 
@@ -517,125 +459,125 @@ atom.dom(function () {
                 if (answersOptions[0]) {
                     answersOptions[0].position = [20, 320, 300, 25];
 
-                       var an0 = new Answer(answersLayer, answersOptions[0])
-                            .listenMouse()
-                            .addEvent('click', function () {
-                                answersOptions[0].method();
-                                if(an0){
-                                    an0.removeEvent('click');
-                                    an0.removeEvent('mouseover');
-                                    an0.removeEvent('mouseout');
-                                    an0.display = false;
-                                }
-                                if(an1){
-                                    an1.removeEvent('click');
-                                    an1.removeEvent('mouseover');
-                                    an1.removeEvent('mouseout');
-                                    an1.display = false;
-                                }
-                                if(an2){
-                                    an2.removeEvent('click');
-                                    an2.removeEvent('mouseover');
-                                    an2.removeEvent('mouseout');
-                                    an2.display = false;
-                                }
-                                if(an3){
-                                    an3.removeEvent('click');
-                                    an3.removeEvent('mouseover');
-                                    an3.removeEvent('mouseout');
-                                    an3.display = false;
-                                }
-                            })
-                            .addEvent('mouseover', function () {
-                                dialogOver(this);
-                            })
-                            .addEvent('mouseout', function () {
-                                dialogOut(this);
-                            })
+                    an0 = new Answer(answersLayer, answersOptions[0])
+                        .listenMouse()
+                        .addEvent('click', function () {
+                            answersOptions[0].method();
+                            if (an0){
+                                an0.removeEvent('click');
+                                an0.removeEvent('mouseover');
+                                an0.removeEvent('mouseout');
+                                an0.display = false;
+                            }
+                            if (an1){
+                                an1.removeEvent('click');
+                                an1.removeEvent('mouseover');
+                                an1.removeEvent('mouseout');
+                                an1.display = false;
+                            }
+                            if (an2){
+                                an2.removeEvent('click');
+                                an2.removeEvent('mouseover');
+                                an2.removeEvent('mouseout');
+                                an2.display = false;
+                            }
+                            if (an3){
+                                an3.removeEvent('click');
+                                an3.removeEvent('mouseover');
+                                an3.removeEvent('mouseout');
+                                an3.display = false;
+                            }
+                        })
+                        .addEvent('mouseover', function () {
+                              dialogOver(this);
+                          })
+                        .addEvent('mouseout', function () {
+                            dialogOut(this);
+                        })
                     libcanvas.addElement(an0);
                 }
                 if (answersOptions[1]) {
                     answersOptions[1].position = [20, 345, 300, 25];
 
-                      var an1 =  new Answer(answersLayer, answersOptions[1])
-                            .listenMouse()
-                            .addEvent('click', function () {
-                                answersLayer.ctx.clearAll();
-                                //console.log(answersOptions[1].method);
-                                //preload(answersOptions[1].method);
-                                answersOptions[1].method();
-                                if(an0){
-                                    an0.removeEvent('click');
-                                    an0.removeEvent('mouseover');
-                                    an0.removeEvent('mouseout');
-                                    an0.display = false;
-                                }
-                                if(an1){
-                                    an1.removeEvent('click');
-                                    an1.removeEvent('mouseover');
-                                    an1.removeEvent('mouseout');
-                                    an1.display = false;
-                                }
-                                if(an2){
-                                    an2.removeEvent('click');
-                                    an2.removeEvent('mouseover');
-                                    an2.removeEvent('mouseout');
-                                    an2.display = false;
-                                }
-                                if(an3){
-                                    an3.removeEvent('click');
-                                    an3.removeEvent('mouseover');
-                                    an3.removeEvent('mouseout');
-                                    an3.display = false;
-                                }
-                            })
-                            .addEvent('mouseover', function () {
-                                dialogOver(this);
-                            })
-                            .addEvent('mouseout', function () {
-                                dialogOut(this);
-                            })
+                    an1 = new Answer(answersLayer, answersOptions[1])
+                        .listenMouse()
+                        .addEvent('click', function () {
+                            answersLayer.ctx.clearAll();
+                            //console.log(answersOptions[1].method);
+                            //preload(answersOptions[1].method);
+                            answersOptions[1].method();
+                            if (an0){
+                                an0.removeEvent('click');
+                                an0.removeEvent('mouseover');
+                                an0.removeEvent('mouseout');
+                                an0.display = false;
+                            }
+                            if (an1){
+                                an1.removeEvent('click');
+                                an1.removeEvent('mouseover');
+                                an1.removeEvent('mouseout');
+                                an1.display = false;
+                            }
+                            if (an2){
+                                an2.removeEvent('click');
+                                an2.removeEvent('mouseover');
+                                an2.removeEvent('mouseout');
+                                an2.display = false;
+                            }
+                            if (an3){
+                                an3.removeEvent('click');
+                                an3.removeEvent('mouseover');
+                                an3.removeEvent('mouseout');
+                                an3.display = false;
+                            }
+                        })
+                        .addEvent('mouseover', function () {
+                            dialogOver(this);
+                        })
+                        .addEvent('mouseout', function () {
+                            dialogOut(this);
+                        });
                     libcanvas.addElement(an1);
                 }
                 if (answersOptions[2]) {
                     answersOptions[2].position = [20, 370, 300, 25];
 
-                      var an2 =  new Answer(answersLayer, answersOptions[2])
-                            .listenMouse()
-                            .addEvent('click', function () {
-                                answersLayer.ctx.clearAll();
-                                answersOptions[2].method();
-                                if(an0){
-                                    an0.removeEvent('click');
-                                    an0.removeEvent('mouseover');
-                                    an0.removeEvent('mouseout');
-                                    an0.display = false;
-                                }
-                                if(an1){
-                                    an1.removeEvent('click');
-                                    an1.removeEvent('mouseover');
-                                    an1.removeEvent('mouseout');
-                                    an1.display = false;
-                                }
-                                if(an2){
-                                    an2.removeEvent('click');
-                                    an2.removeEvent('mouseover');
-                                    an2.removeEvent('mouseout');
-                                    an2.display = false;
-                                }
-                                if(an3){
-                                    an3.removeEvent('click');
-                                    an3.removeEvent('mouseover');
-                                    an3.removeEvent('mouseout');
-                                    an3.display = false;
-                                }
-                            })
-                            .addEvent('mouseover', function () {
-                                dialogOver(this);
-                            })
-                            .addEvent('mouseout', function () {
-                                dialogOut(this);
-                            })
+                    var an2 =  new Answer(answersLayer, answersOptions[2])
+                        .listenMouse()
+                        .addEvent('click', function () {
+                            answersLayer.ctx.clearAll();
+                            answersOptions[2].method();
+                            if (an0){
+                                an0.removeEvent('click');
+                                an0.removeEvent('mouseover');
+                                an0.removeEvent('mouseout');
+                                an0.display = false;
+                            }
+                            if (an1){
+                                an1.removeEvent('click');
+                                an1.removeEvent('mouseover');
+                                an1.removeEvent('mouseout');
+                                an1.display = false;
+                            }
+                            if (an2){
+                                an2.removeEvent('click');
+                                an2.removeEvent('mouseover');
+                                an2.removeEvent('mouseout');
+                                an2.display = false;
+                            }
+                            if (an3){
+                                an3.removeEvent('click');
+                                an3.removeEvent('mouseover');
+                                an3.removeEvent('mouseout');
+                                an3.display = false;
+                            }
+                        })
+                        .addEvent('mouseover', function () {
+                            dialogOver(this);
+                        })
+                        .addEvent('mouseout', function () {
+                            dialogOut(this);
+                        });
                     libcanvas.addElement(an2);
                 }
             }
@@ -656,10 +598,6 @@ atom.dom(function () {
             }
 
         function run(){
-        	/*ship.x = [Number.random(40, canvasSize.x-40), Number.random(40, canvasSize.y-40)];
-        	ship.y =  [Number.random(40, canvasSize.x-40), Number.random(40, canvasSize.y-40)];
-        	ship.moving = true;
-        	ship.playing = true;*/
             cistern.boom = false;
             interval = setInterval( function() {
                 cCisterns.time = --p;
@@ -702,7 +640,7 @@ atom.dom(function () {
                 cistern.type = 'nark';
                 ship.structure = 200;
 
-            } else if(cCisterns.num > 30 && cistern.type == 'nark') {
+            } else if (cCisterns.num > 30 && cistern.type == 'nark') {
                 dialog = '  Мда, слабовато. Ты набрал всего лишь ' + cCisterns.num + ' очков! Думаю, ты всё ещё сможеш собрать больше товара...';
             }
             drawDialog(dialog, drawOptions);
@@ -716,7 +654,7 @@ atom.dom(function () {
         /////////////////
         libcanvas.addFunc(function () {
             if (play) {
-                if(this.getKey('aleft') && this.getKey('adown')){
+                if (this.getKey('aleft') && this.getKey('adown')){
                     if (ship.angle == 0) {
                         ship.angle = 360;
                     }
@@ -743,7 +681,7 @@ atom.dom(function () {
                     if (speed < forwardSpeed) {
                         forwardSpeed--;
                     }
-                } else if(this.getKey('aright')){
+                } else if (this.getKey('aright')){
                     if (ship.angle == 360) {
                         ship.angle = 0;
                     }
@@ -759,15 +697,15 @@ atom.dom(function () {
                     if (ship.angle < 90) {
                         ship.x = ship.x + forwardSpeed * Math.sin((ship.angle).degree());
                         ship.y = ship.y - forwardSpeed * Math.sin((90-ship.angle).degree());
-                    } else if(90 <= ship.angle && ship.angle < 180) {
+                    } else if (90 <= ship.angle && ship.angle < 180) {
                         angle = ship.angle-90;
                         ship.x = ship.x + forwardSpeed * Math.sin((90-angle).degree());
                         ship.y = ship.y + forwardSpeed * Math.sin((angle).degree());
-                    } else if(180 <= ship.angle && ship.angle < 270) {
+                    } else if (180 <= ship.angle && ship.angle < 270) {
                         angle = ship.angle-180;
                         ship.x = ship.x - forwardSpeed * Math.sin((angle).degree());
                         ship.y = ship.y + forwardSpeed * Math.sin((90-angle).degree());
-                    } else if(ship.angle >= 270) {
+                    } else if (ship.angle >= 270) {
                         angle = ship.angle-270;
                         ship.x = ship.x - forwardSpeed * Math.sin((90-angle).degree());
                         ship.y = ship.y - forwardSpeed * Math.sin((angle).degree());
@@ -778,15 +716,15 @@ atom.dom(function () {
                     if (ship.angle < 90) {
                         ship.x = ship.x - backSpeed * Math.sin((ship.angle).degree());
                         ship.y = ship.y + backSpeed * Math.sin((90-ship.angle).degree());
-                    } else if(90 <= ship.angle && ship.angle < 180) {
+                    } else if (90 <= ship.angle && ship.angle < 180) {
                         angle = ship.angle-90;
                         ship.x = ship.x - backSpeed * Math.sin((90-angle).degree());
                         ship.y = ship.y - backSpeed * Math.sin((angle).degree());
-                    } else if(180 <= ship.angle && ship.angle < 270) {
+                    } else if (180 <= ship.angle && ship.angle < 270) {
                         angle = ship.angle-180;
                         ship.x = ship.x + backSpeed * Math.sin((angle).degree());
                         ship.y = ship.y - backSpeed * Math.sin((90-angle).degree());
-                    } else if(ship.angle >= 270) {
+                    } else if (ship.angle >= 270) {
                         angle = ship.angle-270;
                         ship.x = ship.x + backSpeed * Math.sin((90-angle).degree());
                         ship.y = ship.y + backSpeed * Math.sin((angle).degree());

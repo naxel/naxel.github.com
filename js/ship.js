@@ -91,7 +91,7 @@
         },
 
         draw : function () {
-            if(!this._playing){
+            if (!this._playing){
                 return;
             }
             if (this._boom ) {

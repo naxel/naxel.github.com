@@ -63,7 +63,7 @@
         },
 
         isImpact: function (pos) {
-            if(pos[0] <= this._pos[0]+48 && pos[0] >= this._pos[0]-48
+            if (pos[0] <= this._pos[0]+48 && pos[0] >= this._pos[0]-48
                     && pos[1] <= this._pos[1]+48 && pos[1] >= this._pos[1]-48){
                 return true;
             } else {
@@ -73,7 +73,7 @@
 
         draw : function () {
 
-            if(!play || !this.fly){
+            if (!play || !this.fly){
                 return;
             }
             if (this._boom ) {
@@ -97,7 +97,7 @@
                 this.libcanvas.getAudio('explosion').play();
 
             }else{
-            	if(this._endPos[0] > this._pos[0] || this._endPos[1] < this._pos[1]){
+            	if (this._endPos[0] > this._pos[0] || this._endPos[1] < this._pos[1]){
                     //this._pos = [canvasSize.x, 0];
                     this._pos = [Number.random(40, canvasSize.x-40), 0];
                 } else {

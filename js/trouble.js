@@ -44,7 +44,7 @@
         },
 
         isTroubled: function (pos) {
-            if(pos[0] <= this._pos[0]+64 && pos[0] >= this._pos[0]-64
+            if (pos[0] <= this._pos[0]+64 && pos[0] >= this._pos[0]-64
                     && pos[1] <= this._pos[1]+64 && pos[1] >= this._pos[1]-64){
                 return true;
             } else {
@@ -53,11 +53,11 @@
         },
 
         draw : function () {
-            if(!play){
+            if (!play){
                 return;
             }
             if (this._type == 'hedgehog') {
-                if(
+                if (
                     this.animation.run({
                         line : Array.range(0,319),
                         delay: 40,
