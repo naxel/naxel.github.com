@@ -748,13 +748,15 @@ atom.dom(function () {
                         cCisterns.structure = ship.structure;
                     }
                 }
-                if (asteroid.isImpact([ship.x,ship.y])) {
+                var impact = asteroid.isImpact([ship.x,ship.y]);
+                if (impact) {
                 	ship.structure -= Number.random(25, 50);
                 	if (ship.structure > 0) {
-                        ship.x -= asteroid.delta[0] * 20;
-                        ship.y += asteroid.delta[1] * 20;
-                        asteroid.boom = true;
                         cCisterns.structure = ship.structure;
+                        ship.x += impact[0];
+                        ship.y += impact[1];
+                        ship.moving = false;
+                        setTimeout(function(){ship.moving = true}, 500);
                     } else {
                         end();
                     }

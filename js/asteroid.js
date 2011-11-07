@@ -3,8 +3,6 @@
  * Date: 06.11.11
  * Time: 18:30
  */
-
-
     var Asteroid = atom.Class({
         position : null,
 
@@ -58,14 +56,31 @@
         set type (value) {
             this._type = value;
         },
-        get delta () {
-            return [this._dx, this._dy];
-        },
 
         isImpact: function (pos) {
             if (pos[0] <= this._pos[0]+48 && pos[0] >= this._pos[0]-48
-                    && pos[1] <= this._pos[1]+48 && pos[1] >= this._pos[1]-48){
-                return true;
+                    && pos[1] <= this._pos[1]+48 && pos[1] >= this._pos[1]-48) {
+
+                var z = 100;
+                if (pos[0] > this._pos[0]) {
+                    var x1 = pos[0] - this._pos[0];
+                    var xk = 1;
+                } else {
+                    var x1 = this._pos[0] - pos[0];
+                    var xk = -1;
+                }
+
+                if (pos[1] > this._pos[1]) {
+                    var y1 = pos[1] - this._pos[1];
+                    var yk = 1;
+                } else {
+                    var y1 = this._pos[1] - pos[1];
+                    var yk = -1;
+                }
+                var y = z * y1/Math.sqrt(x1 * x1 + y1 * y1);
+                var x = Math.sqrt(z * z - y * y);
+                this._boom = true;
+                return [x * xk, y * yk];
             } else {
                 return false;
             }
@@ -76,12 +91,11 @@
             if (!play || !this.fly){
                 return;
             }
-            if (this._boom ) {
+            if (this._boom) {
 
                 this.destruction.run({
                     line : Array.range(0,51),
                     delay: 40,
-                    //repeat: 1,
                     loop : false
                 }).addEvent('stop', function () {
                     this._boom = false;
@@ -96,7 +110,7 @@
                     });
                 this.libcanvas.getAudio('explosion').play();
 
-            }else{
+            } else {
             	if (this._endPos[0] > this._pos[0] || this._endPos[1] < this._pos[1]){
                     //this._pos = [canvasSize.x, 0];
                     this._pos = [Number.random(40, canvasSize.x-40), 0];
@@ -118,6 +132,5 @@
                     }
                 }
             }
-
         }
     });

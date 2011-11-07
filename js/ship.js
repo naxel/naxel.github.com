@@ -4,7 +4,6 @@
  * Time: 18:59
  */
     var Ship = atom.Class({
-        position : null,
 
         Extends : LibCanvas.Behaviors.Drawable,
         Implements: [
@@ -20,13 +19,11 @@
             this.spriteSize = 128;
             this._x = position[0];
             this._y = position[1];
-            this.position = position;
             this._angle = angle;
             this._moving = true;
             this._playing = true;
             this._structure = 100;
             this._boom = false;
-
 
             this.addEvent('libcanvasSet', function () {
                 this.animation = new LibCanvas.Animation.Sprite()
@@ -38,8 +35,6 @@
                     });
                 this.destruction = new LibCanvas.Animation.Sprite()
                 .addSprites(this.libcanvas.getImage('des'), 144);
-
-                //this.libcanvas.getAudio('explosion').playNext();
             });
         },
 
@@ -66,7 +61,6 @@
                     this._x = value;
                 }
             }
-
         },
         get y () {
             return this._y;
@@ -77,7 +71,6 @@
                     this._y = value;
                 }
             }
-
         },
         set moving (value) {
             this._moving = value;
@@ -95,14 +88,14 @@
                 return;
             }
             if (this._boom ) {
-
+                this._playing = true;
                 this.destruction.run({
                     line : Array.range(0,51),
                     delay: 40,
-                    //repeat: 1,
                     loop : false
                 }).addEvent('stop', function () {
                     this._boom = false;
+                    this._playing = false;
                     //this.libcanvas.rmElement(this);
                     this.destruction.stop(true);
 
@@ -116,12 +109,10 @@
             } else {
                 this.animation && this.libcanvas.ctx.drawImage({
                     image : this.animation.sprite,
-                    //from: this.position,
                     //from: [this._x, this._y],
                     center: [this._x, this._y],
-                    angle: (this._angle).degree()//this._angle
+                    angle: (this._angle).degree()
                 });
             }
-
         }
     });
