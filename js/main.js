@@ -88,8 +88,10 @@ atom.dom(function () {
                     loop : false
                 }).addEvent('stop', function () {
                     this._boom = false;
-                    this.libcanvas.rmElement(this);
+                    //this.libcanvas.rmElement(this);
+
                     this.destruction.stop(true);
+                    this._pos = [Number.random(40, canvasSize.x-40), Number.random(40, canvasSize.y-40)];
 
                 }.bind(this));
                 this.destruction.sprite && this.libcanvas.ctx.drawImage({
@@ -257,10 +259,6 @@ atom.dom(function () {
             dialogLayer.hide();
             answersLayer.hide();
             ///////////////////////////////
-            ship.playing = true;
-            ship.moving = true;
-            ship.x = [Number.random(40, canvasSize.x-40), Number.random(40, canvasSize.y-40)];
-            ship.y =  [Number.random(40, canvasSize.x-40), Number.random(40, canvasSize.y-40)];
             ship.moving = true;
             ship.playing = true;
             ship.x = [Number.random(50, canvasSize.x-50), Number.random(50, canvasSize.y-50)];
@@ -794,8 +792,8 @@ atom.dom(function () {
                     }
                 }
 
-                if ((ship.x >= (cistern.pos[0]-40) && ship.x <= (cistern.pos[0] + 65))
-                        && (ship.y >= (cistern.pos[1]-40) && ship.y <= (cistern.pos[1] + 65))) {
+                if ((ship.x >= (cistern.pos[0]-40) && ship.x <= (cistern.pos[0] + 40))
+                        && (ship.y >= (cistern.pos[1]-40) && ship.y <= (cistern.pos[1] + 40))) {
                     libcanvas.getAudio('buy').set({volume:0.1}).fade(250, 0.1, true).play();
                     cCisterns.num = ++cCisterns.num;
                     cistern.pos = [Number.random(40, canvasSize.x-40), Number.random(40, canvasSize.y-40)];
@@ -806,7 +804,6 @@ atom.dom(function () {
                         cistern.pos = [-100, -100];
                         end();
                     } else {
-                        //console.log('trable');
                         ship.structure -=1;
                         cCisterns.structure = ship.structure;
                     }
@@ -818,12 +815,15 @@ atom.dom(function () {
                         cCisterns.structure = ship.structure;
                         ship.x += impact[0];
                         ship.y += impact[1];
-                        ship.moving = false;
-                        setTimeout(function(){ship.moving = true}, 500);
                     } else {
                         end();
                     }
                 }
+                asteroid.isImpact(trouble.pos);
+                if(asteroid.isImpact(cistern.pos)){
+                    cistern.boom = true;
+                }
+
                 this.update();
             }
         });

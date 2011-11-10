@@ -58,8 +58,8 @@
         },
 
         isImpact: function (pos) {
-            if (pos[0] <= this._pos[0]+48 && pos[0] >= this._pos[0]-48
-                    && pos[1] <= this._pos[1]+48 && pos[1] >= this._pos[1]-48) {
+            if (pos[0] <= this._pos[0]+30 && pos[0] >= this._pos[0]-30
+                    && pos[1] <= this._pos[1]+30 && pos[1] >= this._pos[1]-30 && !this._boom) {
 
                 var z = 100;
                 if (pos[0] > this._pos[0]) {

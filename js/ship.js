@@ -16,7 +16,7 @@
         initialize : function (position, angle, canvasXY) {
             this._maxX = canvasXY[0];
             this._maxY = canvasXY[1];
-            this.spriteSize = 128;
+            this.spriteSize = 80;
             this._x = position[0];
             this._y = position[1];
             this._angle = angle;
@@ -106,7 +106,7 @@
                 this.libcanvas.getAudio('explosion').play();
 
             } else {
-                this.animation.addSprites(this.libcanvas.getImage(this._shipType), this.spriteSize)
+                this.animation.addSprites(this.libcanvas.getImage(this._shipType), 128)
                     .run({
                         line : Array.range(0,49),
                         delay: 40,
@@ -114,7 +114,8 @@
                     }) && this.libcanvas.ctx.drawImage({
                     image : this.animation.sprite,
                     //from: [this._x, this._y],
-                    center: [this._x, this._y],
+                    draw: [this._x-(this.spriteSize/2),this._y-(this.spriteSize/2),this.spriteSize,this.spriteSize],
+                    //center: [this._x, this._y],
                     angle: (this._angle).degree()
                 });
             }

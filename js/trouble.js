@@ -44,8 +44,8 @@
         },
 
         isTroubled: function (pos) {
-            if (pos[0] <= this._pos[0]+64 && pos[0] >= this._pos[0]-64
-                    && pos[1] <= this._pos[1]+64 && pos[1] >= this._pos[1]-64){
+            if (pos[0] <= this._pos[0]+50 && pos[0] >= this._pos[0]-50
+                    && pos[1] <= this._pos[1]+50 && pos[1] >= this._pos[1]-50){
                 return true;
             } else {
                 return false;
