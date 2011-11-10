@@ -179,7 +179,11 @@ atom.dom(function () {
         fps: 24,
         //invoke: true,
         preloadImages: {
-            test: 'images/fiew.png',
+            feiws: 'images/feiws.png',
+            malocrs: 'images/malocrs.png',
+            pelengps: 'images/pelengps.png',
+            gaalrs: 'images/gaalrs.png',
+            peopleps: 'images/peopleps.png',
             cistern: 'images/cistern.png',
             des: 'images/des.png',
             background: 'images/1bg.png',
@@ -188,7 +192,9 @@ atom.dom(function () {
             dispatcher: 'images/signal.png',
             nark: 'images/1GOODS8.png',
             hedgehog: 'images/hedgehog.png',
-            asteroid: 'images/asteroid.png'
+            asteroid_11: 'images/asteroid_11.png',
+            asteroid_12: 'images/asteroid_12.png',
+            asteroid_14: 'images/asteroid_14.png'
 
         },
         preloadAudio: {
@@ -241,7 +247,7 @@ atom.dom(function () {
             var drawOptions = [
                 {
                     text: ' - Ладно, Полетели!',
-                    method : start
+                    method : choseShip
                 }
             ];
             drawDialog('  Пшол вон!', drawOptions);
@@ -299,7 +305,7 @@ atom.dom(function () {
                 },
                 {
                     text: ' - Полетели!',
-                    method : start
+                    method : choseShip
                 }
             ];
             drawDialog('  Тебе, что делать нечего?', drawOptions);
@@ -316,12 +322,69 @@ atom.dom(function () {
                 },
                 {
                     text: ' - Полетели!',
-                    method : start
+                    method : choseShip
                 }
             ];
             drawDialog('  Я же только что расказал.', drawOptions);
         }
 
+        function choseShip(){
+            var drawOptions = [
+                {
+                    text: ' - Корсар-256',
+                    method : chosePeople
+                },
+                {
+                    text: ' - Рейнджер-512',
+                    method: choseGaal
+                },
+
+                {
+                    text: ' - Это и всё?',
+                    method: choseShip2
+                }
+            ];
+            var message = '  Ах, да вы же забыли выбрать корабль! \n Куда же без него. Кхе-хе...';
+             drawDialog(message, drawOptions);
+        }
+        function choseShip2(){
+            var drawOptions = [
+                {
+                    text: ' - Воин-128',
+                    method: choseFeiw
+                },
+                {
+                    text: ' - Пират-64',
+                    method: chosePeleng
+                },
+                {
+                    text: ' - Рейнджер-1024',
+                    method : choseMaloc
+                }
+            ];
+            var message = '  Это резерв. Больше нету. Выбирай и не командуй!';
+             drawDialog(message, drawOptions);
+        }
+        function chosePeople(){
+            ship.shipType = 'peopleps';
+            start();
+        }
+        function choseFeiw(){
+            ship.shipType = 'feiws';
+            start();
+        }
+        function choseGaal(){
+            ship.shipType = 'gaalrs';
+            start();
+        }
+        function chosePeleng(){
+            ship.shipType = 'pelengps';
+            start();
+        }
+        function choseMaloc(){
+            ship.shipType = 'malocrs';
+            start();
+        }
         function anekdot(){
             var drawOptions = [
                 {
@@ -334,7 +397,7 @@ atom.dom(function () {
                 },
                 {
                     text: ' - Полетели!',
-                    method : start
+                    method : choseShip
                 }
             ];
 
@@ -443,7 +506,7 @@ atom.dom(function () {
             },
             {
                 text: ' - Полетели!',
-                method: start
+                method: choseShip
             }
         ];
 
@@ -627,7 +690,7 @@ atom.dom(function () {
                 },
                 {
                     text: ' - Полетели!',
-                    method : start
+                    method : choseShip
                 }
             ];
             var dialog = '  Мда, слабовато. Ты набрал всего лишь ' + cCisterns.num + ' очков!';

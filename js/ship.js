@@ -24,15 +24,11 @@
             this._playing = true;
             this._structure = 100;
             this._boom = false;
+            this._shipType = 'feiws';
 
             this.addEvent('libcanvasSet', function () {
-                this.animation = new LibCanvas.Animation.Sprite()
-                    .addSprites(this.libcanvas.getImage('test'), this.spriteSize)
-                    .run({
-                        line : Array.range(0,96),
-                        delay: 40,
-                        loop : true
-                    });
+                this.animation = new LibCanvas.Animation.Sprite();
+
                 this.destruction = new LibCanvas.Animation.Sprite()
                 .addSprites(this.libcanvas.getImage('des'), 144);
             });
@@ -82,6 +78,9 @@
         set boom (value) {
             this._boom = value;
         },
+        set shipType (value) {
+            this._shipType = value;
+        },
 
         draw : function () {
             if (!this._playing){
@@ -107,7 +106,12 @@
                 this.libcanvas.getAudio('explosion').play();
 
             } else {
-                this.animation && this.libcanvas.ctx.drawImage({
+                this.animation.addSprites(this.libcanvas.getImage(this._shipType), this.spriteSize)
+                    .run({
+                        line : Array.range(0,49),
+                        delay: 40,
+                        loop : true
+                    }) && this.libcanvas.ctx.drawImage({
                     image : this.animation.sprite,
                     //from: [this._x, this._y],
                     center: [this._x, this._y],

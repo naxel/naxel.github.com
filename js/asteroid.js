@@ -22,11 +22,11 @@
             this._dx = this._speed * canvasSize.x / Math.sqrt(canvasSize.x * canvasSize.x + canvasSize.y * canvasSize.y);
             this._dy = this._speed * canvasSize.y / Math.sqrt(canvasSize.x * canvasSize.x + canvasSize.y * canvasSize.y);
 
-            this._type = 'asteroid';
+            this._type = 'asteroid_11';
 
             this.addEvent('libcanvasSet', function () {
                 this.animation = new LibCanvas.Animation.Sprite()
-                    .addSprites(this.libcanvas.getImage('asteroid'), 48);
+
                 this.destruction = new LibCanvas.Animation.Sprite()
                 .addSprites(this.libcanvas.getImage('des'), 144);
 
@@ -102,6 +102,15 @@
                     //this.libcanvas.rmElement(this);
                     this.destruction.stop(true);
                     this.pos = [Number.random(40, canvasSize.x-40), 0];
+                    var ran = Number.random(0, 2);
+                    if (ran == 1) {
+                         this._type = 'asteroid_11';
+                    } else if(ran == 2) {
+                         this._type = 'asteroid_12';
+                    } else {
+                         this._type = 'asteroid_14';
+                    }
+
 
                 }.bind(this));
                 this.destruction.sprite && this.libcanvas.ctx.drawImage({
@@ -114,14 +123,23 @@
             	if (this._endPos[0] > this._pos[0] || this._endPos[1] < this._pos[1]){
                     //this._pos = [canvasSize.x, 0];
                     this._pos = [Number.random(40, canvasSize.x-40), 0];
+                    var ran = Number.random(0, 2);
+                    if (ran == 1) {
+                         this._type = 'asteroid_11';
+                    } else if(ran == 2) {
+                         this._type = 'asteroid_12';
+                    } else {
+                         this._type = 'asteroid_14';
+                    }
                 } else {
                     this.pos[0] -= this._dx;
                     this.pos[1] += this._dy;
                 }
-                if (this._type == 'asteroid') {
+                //if (this._type == 'asteroid') {
                     if (
-                        this.animation.run({
-                            line : Array.range(0,99),
+                        this.animation.addSprites(this.libcanvas.getImage(this._type), 48)
+                            .run({
+                            line : Array.range(0,80),
                             delay: 40,
                             loop : true
                         }) ) {
@@ -130,7 +148,7 @@
                             center: this._pos
                         });
                     }
-                }
+                //}
             }
         }
     });
