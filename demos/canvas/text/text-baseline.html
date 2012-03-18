@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Baseline</title>
+</head>
+<body>
+<canvas id="canvas" width="600" height="200"></canvas>
+
+<script>
+    var canvas = document.getElementById('canvas');
+    var ctx = canvas.getContext("2d");
+
+    ctx.fillStyle = "#F00";
+    ctx.font      = "16px Verdana";
+
+    ctx.lineWidth  = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, 75);
+    ctx.lineTo(500, 75);
+    ctx.stroke();
+    ctx.closePath();
+
+    ctx.textBaseline = "top";
+    ctx.fillText("top", 0, 75);
+
+    ctx.textBaseline = "hanging";
+    ctx.fillText("hanging", 40, 75);
+
+    ctx.textBaseline = "middle";
+    ctx.fillText("middle", 120, 75);
+
+    ctx.textBaseline = "alphabetic";
+    ctx.fillText("alphabetic", 200, 75);
+
+    ctx.textBaseline = "ideographic";
+    ctx.fillText("ideographic", 300, 75);
+
+    ctx.textBaseline = "bottom";
+    ctx.fillText("bottom", 400, 75);
+</script>
+</body>
+</html>

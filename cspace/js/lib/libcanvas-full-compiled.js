@@ -876,6 +876,7 @@ var Geometry = LibCanvas.Geometry = Class(
 		if (arguments.length) this.set.apply(this, arguments);
 	},
 	invertDirection: function (distance, reverse) {
+		distance = Point( distance );
 		var multi = reverse ? -1 : 1;
 		return {
 			x : distance.x * multi,
@@ -1533,17 +1534,6 @@ var Mouse = LibCanvas.Mouse = Class(
 			click      : waitEvent('click', false),
 			dblclick   : waitEvent('dblclick', false),
 			contextmenu: waitEvent('contextmenu', false),
-			// remove activating in android
-			//touchstart : function (e) {
-			//	move(false, e);
-			//	down(e);
-			//},
-			//touchmove: move.bind(null, false),
-			//touchend : function (e) {
-			//	move(false, e);
-			//	up(e);
-			//	out(e);
-			//},
 			mouseover  : over,
 			mousedown  : down,
 			mouseup    : up,
@@ -1572,7 +1562,11 @@ var Mouse = LibCanvas.Mouse = Class(
 		}
 	},
 	debug : function (on) {
-		this.debugTrace = on === false ? null : new Trace();
+		if (on && !this.debugTrace) {
+			this.debugTrace = new Trace();
+		} else if (on === false) {
+			this.debugTrace = null;
+		}
 		this.debugUpdate();
 		return this;
 	},
@@ -1635,7 +1629,7 @@ var MouseListener = LibCanvas.Behaviors.MouseListener = Class({
 
 	listenMouse : function (stopListen) {
 		if (this.scene) {
-			this.scene.resources.mouse.subscribe( this );
+			this.scene.resources.mouse[stopListen ? 'unsubscribe' : 'subscribe']( this );
 			return this;
 		}
 
@@ -1672,9 +1666,9 @@ provides: Behaviors.Clickable
 
 var Clickable = LibCanvas.Behaviors.Clickable = function () {
 
-var setValFn = function (object, name, val) {
+var setValFn = function (object, name, val, noEventStop) {
 	return function (event) {
-		if (typeof event.stop == 'function') event.stop();
+		if (!noEventStop && typeof event.stop == 'function') event.stop();
 		if (object[name] != val) {
 			object[name] = val;
 			object.fireEvent('statusChanged');
@@ -1688,14 +1682,13 @@ return Class({
 
 	clickable : function () { 
 		this.listenMouse();
-
-		var fn = setValFn.bind(null, this);
 		
-		this.addEvent('mouseover', fn('hover', true));
-		this.addEvent('mouseout' , fn('hover', false));
-		this.addEvent('mousedown', fn('active', true));
-		this.addEvent(['mouseup', 'away:mouseout', 'away:mouseup'],
-			fn('active', false));
+		this.addEvent('mouseover', setValFn(this, 'hover' , true ));
+		this.addEvent('mouseout' , setValFn(this, 'hover' , false));
+		this.addEvent('mousedown', setValFn(this, 'active', true ));
+		this.addEvent('mouseup'  , setValFn(this, 'active', false));
+		this.addEvent(['away:mouseout', 'away:mouseup'],
+			setValFn(this, 'active', false, true));
 		return this;
 	}
 });
@@ -1737,6 +1730,8 @@ var initDraggable = function () {
 		},
 		stopDrag  = ['up', 'out'],
 		onStopDrag = function (e) {
+			if (e.button !== 0) return;
+
 			draggable.fireEvent('stopDrag', [ e ]);
 			mouse
 				.removeEvent( 'move', dragFn)
@@ -1746,6 +1741,8 @@ var initDraggable = function () {
 	draggable.listenMouse();
 
 	draggable.addEvent( 'mousedown' , function (e) {
+		if (e.button !== 0) return;
+
 		if (!draggable['draggable.isDraggable']) return;
 		if (typeof e.stop == 'function') e.stop();
 		
@@ -3102,6 +3099,8 @@ var Rectangle = LibCanvas.Shapes.Rectangle = Class(
 	},
 	/** @returns {LibCanvas.Shapes.Rectangle} */
 	align: function (rect, sides) {
+		if (sides == null) sides = 'center middle';
+
 		var moveTo = this.from.clone();
 		if (sides.indexOf('left') != -1) {
 			moveTo.x = rect.from.x;
@@ -3178,6 +3177,21 @@ var Rectangle = LibCanvas.Shapes.Rectangle = Class(
 			x : (diff.x / fromRect.width ) * this.width,
 			y : (diff.y / fromRect.height) * this.height
 		});
+	},
+	/** @returns {LibCanvas.Shapes.Rectangle} */
+	fillToPixel: function () {
+		var from = this.from, to = this.to,
+			point = function (method, invoke) {
+				return new Point(
+					Math[method](from.x, to.x),
+					Math[method](from.y, to.y)
+				).invoke( invoke );
+			};
+
+		return new Rectangle(
+			point( 'min', 'floor' ),
+			point( 'max', 'ceil'  )
+		);
 	},
 	/** @returns {LibCanvas.Shapes.Rectangle} */
 	snapToPixel: function () {
@@ -4594,7 +4608,11 @@ var Keyboard = Class(
 		return this;
 	},
 	debug : function (on) {
-		this._debugTrace = on === false ? null : new Trace();
+		if (on && !this._debugTrace) {
+			this._debugTrace = new Trace();
+		} else if (on === false) {
+			this._debugTrace = null;
+		}
 		this.debugUpdate();
 		return this;
 	},
@@ -5644,8 +5662,10 @@ Scene.Element = Class(
 		
 		this.setOptions( options );
 
-		if (this.options.shape) {
-			this.shape = this.options.shape;
+		var ownShape = this.shape && this.shape != this.self.prototype.shape;
+
+		if (ownShape || this.options.shape) {
+			if (!ownShape) this.shape = this.options.shape;
 			this.previousBoundingShape = this.shape;
 		}
 		if (this.options.zIndex != null) {
@@ -5673,22 +5693,16 @@ Scene.Element = Class(
 		return this;
 	},
 
+	clearPrevious: function ( ctx ) {
+		ctx.clear( this.previousBoundingShape );
+		return this;
+	},
+
 	renderTo: function () {
 		var shape = this.shape;
-		if (shape instanceof Rectangle) {
-			var point = function (method, invoke) {
-				return new Point(
-					Math[method](shape.from.x, shape.to.x),
-					Math[method](shape.from.y, shape.to.y)
-				).invoke( invoke );
-			};
-			this.previousBoundingShape = new Rectangle(
-				point( 'min', 'floor' ),
-				point( 'max', 'ceil'  )
-			);
-		} else {
-			this.previousBoundingShape = shape.clone().grow( 2 );
-		}
+		this.previousBoundingShape = shape.fillToPixel ?
+			shape.fillToPixel() : shape.clone().grow( 2 );
+		return this;
 	}
 });
 
@@ -5731,7 +5745,7 @@ Scene.MouseEvent = Class(
 	initialize: function (type, original) {
 		this.type     = type;
 		this.original = original;
-		this.extend( 'offset', 'deltaOffset', 'delta' );
+		this.extend([ 'offset', 'deltaOffset', 'delta', 'button' ]);
 	},
 
 	/** @returns {Scene.MouseEvent} */
@@ -5878,9 +5892,8 @@ Scene.Mouse = Class(
 				}
 			} else if (this.mouse.isOver(elem)) {
 				if (type == 'move') {
-					if (lastMove.contains(elem)) {
+					if (!lastMove.contains(elem)) {
 						elem.fireEvent( 'mouseover', [event] );
-					} else {
 						lastMove.push( elem );
 					}
 				} else if (type == 'down') {
@@ -6060,6 +6073,7 @@ Scene.Standard = Class(
 	 */
 	addElement: function (element) {
 		this.elements.include( element );
+		this.redrawElement( element );
 		return this;
 	},
 
@@ -6116,7 +6130,7 @@ Scene.Standard = Class(
 
 		for (i = 0; i < redraw.length; i++) {
 			elem = redraw[i];
-			clear.push( elem.previousBoundingShape );
+			clear.push( elem );
 
 			if (this.options.intersection !== 'manual') {
 				this.findIntersections(elem.previousBoundingShape, elem)
@@ -6132,7 +6146,7 @@ Scene.Standard = Class(
 		}
 
 		for (i = clear.length; i--;) {
-			ctx.clear( clear[i] );
+			clear[i].clearPrevious( ctx );
 		}
 
 		redraw.sortBy( 'zIndex', true );
@@ -7588,8 +7602,8 @@ atom.implement(HTMLImageElement, {
 
 			if (x) current.x -= rect.from.x;
 			if (y) current.y -= rect.from.y;
-			
-			buf.ctx.drawImage({
+
+			if (size.width && size.height) buf.ctx.drawImage({
 				image : this,
 				crop  : crop,
 				draw  : new Rectangle({
@@ -7671,6 +7685,9 @@ var ImagePreloader = LibCanvas.Utils.ImagePreloader = Class({
 		};
 
 		if (Array.isArray(images)) images = Object.map(images[1], function (src) {
+			if(src.begins('http://') || src.begins('https://') ) {
+				return src;
+			}
 			return images[0] + src;
 		});
 		this.usrImages = images;
@@ -7688,7 +7705,7 @@ var ImagePreloader = LibCanvas.Utils.ImagePreloader = Class({
 		return this;
 	},
 	onProcessed : function (type, img) {
-		if (type == 'loaded') {
+		if (type == 'loaded' && window.opera) {
 			// opera fullscreen bug workaround
 			img.width  = img.width;
 			img.height = img.height;

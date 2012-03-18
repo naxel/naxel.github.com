@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Multi-line text</title>
+</head>
+<body>
+<canvas id="canvas" width="600" height="200"></canvas>
+
+<script>
+    function wrapText(context, text, marginLeft, marginTop, maxWidth, lineHeight)
+    {
+        var words = text.split(" ");
+        var countWords = words.length;
+        var line = "";
+
+        for (var n = 0; n < countWords; n++) {
+            var testLine = line + words[n] + " ";
+            var testWidth = context.measureText(testLine).width;
+            if (testWidth > maxWidth) {
+                context.fillText(line, marginLeft, marginTop);
+                line = words[n] + " ";
+                marginTop += lineHeight;
+            }
+            else {
+                line = testLine;
+            }
+        }
+        context.fillText(line, marginLeft, marginTop);
+    }
+
+    var canvas = document.getElementById("canvas");
+    var context = canvas.getContext("2d");
+    var maxWidth = 400; //размер поле, где выводится текст
+    var lineHeight = 25;
+    /*если мы знаем высату текста, то мы можем
+     предположить, что высота строки должна быть именно такой*/
+    var marginLeft = 20;
+    var marginTop = 40;
+    var text = "Сначала мы разбиваем текст на слова по пробелам, а потом обходим эти слова в цикле, " +
+            "обьединяя их по одному в строку. Если при последнем обьединении ширина этой строки меньше максимальной, " +
+            "то продолжаем, а если больше, то выводим строку без последнего слова, а его записываем в новую строку." +
+            "И так продолжаем, пока не обработаем весь текст.";
+
+    context.font = "16pt Calibri";
+    context.fillStyle = "#000";
+
+    wrapText(context, text, marginLeft, marginTop, maxWidth, lineHeight);
+</script>
+</body>
+</html>

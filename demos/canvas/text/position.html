@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Position</title>
+</head>
+<body>
+<canvas id="canvas" width="600" height="200"></canvas>
+
+<script>
+    var canvas = document.getElementById("canvas");
+    var context = canvas.getContext("2d");
+
+    context.fillStyle = "#000";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    context.fillStyle = "#FFF";
+    context.textBaseline = "top";
+    context.font = "16pt Calibri";
+    var text = "Этот текст должен быть написан справа в самом низу.";
+    var marginLeft = canvas.width - context.measureText(text).width;
+    var marginTop = canvas.height - getFontHeight(context.font);
+    context.fillText(text, marginLeft, marginTop);
+
+    function getFontHeight(font) {
+        var parent = document.createElement("span");
+        parent.appendChild(document.createTextNode("height"));
+        document.body.appendChild(parent);
+        parent.style.cssText = "font: " + font + "; white-space: nowrap; display: inline;";
+        var height = parent.offsetHeight;
+        document.body.removeChild(parent);
+        return height;
+    }
+</script>
+</body>
+</html>

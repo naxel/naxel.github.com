@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Simple text</title>
+</head>
+<body>
+<canvas id="canvas" width="400" height="400"></canvas>
+
+<script>
+    var canvas = document.getElementById('canvas');
+    var ctx = canvas.getContext("2d");
+
+    ctx.fillStyle = "#00F";
+    ctx.strokeStyle = "#F00";
+    ctx.font = "italic 30pt Arial";
+    ctx.fillText("Fill text", 20, 50);
+    ctx.font = 'bold 30px sans-serif';
+    ctx.strokeText("Stroke text", 20, 100);
+</script>
+</body>
+</html>

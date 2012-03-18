@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Demos &gt; Canvas &gt; Text</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            width: 100%;
+            height: 120px;
+            background: #000;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <canvas id="headerCanvas" width="600" height="100">
+        <h1>Demos &gt; Canvas &gt; Text</h1>
+    </canvas>
+</header>
+<p><a href="simple-text.html">Simple text</a></p>
+<p><a href="text-baseline.html">Text Baseline</a></p>
+<p><a href="text-align.html">Text Align</a></p>
+<p><a href="style.html">Stylization</a></p>
+<p><a href="wrap.html">Multi-line text</a></p>
+<p><a href="position.html">Real position text</a></p>
+
+
+
+<script>
+    var canvas = document.getElementById('headerCanvas');
+    var ctx = canvas.getContext("2d");
+
+    ctx.font = "50px Futura";
+    var text = "Demos > Canvas > Text";
+    var fontHeight = getFontHeight(ctx.font);
+    var marginLeft = 20;
+    var marginTop = fontHeight;
+
+    ctx.save();
+    ctx.scale(1, -1);
+    ctx.translate(marginLeft, -fontHeight - 5);
+
+    var gradient = ctx.createLinearGradient(0, 0, 0, -fontHeight);
+    gradient.addColorStop(0.0, 'rgba(255, 255, 255, 0.6)');
+    gradient.addColorStop(1.0, 'rgba(255, 255, 255, 0)');
+    ctx.fillStyle = gradient;
+    ctx.fillText(text, 0, 0);
+    ctx.strokeText(text, 0, 0);
+    ctx.restore();
+
+    ctx.fillStyle = "#FFF";
+    ctx.shadowColor = "#06A";
+    ctx.shadowOffsetX = 1;
+    ctx.shadowOffsetY = 1;
+    ctx.shadowBlur = 2;
+    ctx.fillText(text, marginLeft, marginTop);
+    ctx.strokeText(text, marginLeft, marginTop);
+
+    function getFontHeight(font) {
+        var parent = document.createElement("span");
+    	parent.appendChild(document.createTextNode("height"));
+        document.body.appendChild(parent);
+    	parent.style.cssText = "font: " + font + "; white-space: nowrap; display: inline;";
+    	var height = parent.offsetHeight;
+        document.body.removeChild(parent);
+    	return height;
+    }
+</script>
+</body>
+</html>
