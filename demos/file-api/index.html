@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>File Api. Demo: LocalPlayer</title>
+    <script src="/js/jquery-1.7.1.min.js"></script>
+    <style>
+        .sound {
+            cursor: pointer;
+        }
+
+        .sound:hover {
+            color: #0051D7;
+        }
+
+        .played {
+            color: #6651D7;
+        }
+    </style>
+</head>
+<body>
+
+<div id="sounds-container">
+    <ul id="sounds-list"></ul>
+</div>
+Громкость:
+<input id="volume" type="range" min="0" max="10" value="1" />
+<span id="duration"> </span>
+
+<input type="file" accept="audio/*" id="files" name="files[]" multiple/>
+<output id="list"></output>
+<script>
+    function handleFileSelect(evt)
+    {
+        var filesArray = evt.target.files; // FileList object
+        // files is a FileList of File objects. List some properties.
+        var output = [];
+        var f;
+        for (var i = 0; f = filesArray[i]; i++) {
+            if (audio.canPlayType(f.type)) {
+                aceptArray.push(f);
+                output.push('<li class="sound" id="sound_' + count + '"><strong>', f.name, '</strong> (', f.type || 'n/a', ') - ',
+                        f.size, //' bytes, last modified: ',
+                        //f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
+                        '</li>');
+                count++;
+            }
+        }
+        document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
+    }
+    var count = 0;
+    var played = 0;
+    var aceptArray = [];
+    var volume = document.getElementById('volume');
+    var audio = document.createElement('audio');
+    document.getElementById('files').addEventListener('change', handleFileSelect, false);
+    $('.sound').live('click', function() {
+        if ($(this).hasClass('played')) {
+            if (audio.paused) {
+                audio.play();
+            }
+            else {
+                audio.pause();
+            }
+            return;
+        }
+
+        $('.sound').removeClass('played');
+        $(this).addClass('played');
+        played = $(this).attr('id').split('_')[1];
+        var reader = new FileReader();
+
+        // Closure to capture the file information.
+        reader.onload = (function(theFile) {
+            return function(e) {
+                audio.setAttribute('src', e.target.result);
+                audio.load();
+                audio.autoplay = true;
+                audio.volume = parseFloat(volume.value / 10);
+
+                // Добавить обработчик события timeupdate для вывода времени воспроизведения
+                audio.addEventListener("timeupdate", function() {
+                    var duration = document.getElementById('duration');
+                    var s = parseInt(audio.currentTime % 60);
+                    if (s < 10) {
+                        s = '0' + s;
+                    }
+                    var m = parseInt((audio.currentTime / 60) % 60);
+                    if (m < 10) {
+                        m = '0' + m;
+                    }
+                    var sd = parseInt(audio.duration % 60);
+                    if (sd < 10) {
+                        sd = '0' + sd;
+                    }
+                    var md = parseInt((audio.duration / 60) % 60);
+                    if (md < 10) {
+                        md = '0' + md;
+                    }
+                    duration.innerHTML = m + ':' + s + ' / ' + md + ':' + sd;
+                    $('title').html(theFile.name + ' - ' + m + ':' + s + ' / ' + md + ':' + sd);
+                    if (audio.ended) {
+                        audio.currentTime = 0;
+                        audio.volume = 0;
+                        audio.pause();
+                        played++;
+                        if (played == count) {
+                            played = 0;
+                        }
+
+                        reader.readAsDataURL(aceptArray[played]);
+                        $('.sound').removeClass('played');
+                        $('#sound_' + played).addClass('played');
+                    }
+                }, false);
+
+
+                volume.addEventListener('change', function() {
+                    audio.volume = parseFloat(this.value / 10);
+                }, false);
+                //audio.autoplay = true;
+                if (volume.value !== undefined) {
+                    audio.volume = parseFloat(volume.value / 10);
+                }
+                else {
+                    audio.volume = 0.1;
+                }
+
+
+            };
+        })(aceptArray[played]);
+        // Read in the file as a data URL.
+        reader.readAsDataURL(aceptArray[played]);
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Preloader - demo</title>
+    <script src="preloader.js"></script>
+</head>
+<body>
+
+<script>
+var response = null;
+    preloader.init(function (data) {
+        response = data;
+        //response['druj'].src.play();
+    });
+    preloader.loadImage({src: '1GOODS8.png', alias: 'nark'});
+    preloader.loadImage({src: '2TV.png', alias: 'tv'});
+    preloader.loadSong({src: 'druj.*', alias: 'druj'});
+    preloader.log = true;
+
+</script>
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>...:::xCanvas...</title>
+    <script src="main.js"></script>
+    <script src="../preload/preloader.js"></script>
+
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+        }
+        canvas{
+            background-color: #CCCCCC;
+        }
+    </style>
+</head>
+<body>
+<p>
+    <input type="file" accept="image/*" id="files" name="files[]" multiple/>
+    <input type="button" id="crop" value="Use Crop">
+    <input type="button" id="clear" value="Clear all">
+    <input type="button" id="align" value="Align">
+    <input type="button" id="getCss" value="Get CSS">
+    <input type="button" id="getCanvas" value="Get Coordinates">
+    <input type="button" id="toPng" value="To PNG">
+</p>
+<canvas id="canvas" height="800" width="800"></canvas>
+<pre id="output-css"></pre>
+<pre id="output-sprite"></pre>
+
+<script>
+    //init();
+
+    var init = function(){
+
+        console.log('I am run!');
+        var title = document.getElementsByTagName('title')[0];
+        title.innerHTML += this.version;
+
+        this.keyHook(
+                [xCanvas.getKey('enter')],
+                function() {
+                    if (xCanvas.crop && Math.abs(xCanvas.myCrop.width) > 15 && Math.abs(xCanvas.myCrop.height) > 15) {
+                        xCanvas.translateCanvas(
+                                xCanvas.myCrop.x,
+                                xCanvas.myCrop.y,
+                                xCanvas.myCrop.width,
+                                xCanvas.myCrop.height
+                        );
+                    }
+                },
+                true
+        );
+        this.keyHook(
+                [xCanvas.getKey('c'), xCanvas.getKey('aleft')],
+                function() {
+                    if (xCanvas.canvasSize.width > 50) {
+                        xCanvas.canvasSize.width--;
+                        xCanvas.canvas.width = xCanvas.canvasSize.width;
+                        xCanvas.ghostcanvas.width = xCanvas.canvasSize.width;
+                        xCanvas.canvasValid = false;
+                    }
+
+                },
+                true
+        );
+        this.keyHook(
+                [xCanvas.getKey('c'), xCanvas.getKey('aup')],
+                function() {
+                    if (xCanvas.canvasSize.height > 50) {
+                        xCanvas.canvasSize.height--;
+                        xCanvas.canvas.height = xCanvas.canvasSize.height;
+                        xCanvas.ghostcanvas.height = xCanvas.canvasSize.height;
+                        xCanvas.canvasValid = false;
+                    }
+                },
+                true
+        );
+        this.keyHook(
+                [xCanvas.getKey('c'), xCanvas.getKey('aright')],
+                function() {
+                    xCanvas.canvasSize.width++;
+                    xCanvas.canvas.width = xCanvas.canvasSize.width;
+                    xCanvas.ghostcanvas.width = xCanvas.canvasSize.width;
+                    xCanvas.canvasValid = false;
+                },
+                true
+        );
+        this.keyHook(
+                [xCanvas.getKey('c'), xCanvas.getKey('adown')],
+                function() {
+                    xCanvas.canvasSize.height++;
+                    xCanvas.canvas.height = xCanvas.canvasSize.height;
+                    xCanvas.ghostcanvas.height = xCanvas.canvasSize.height;
+                    xCanvas.canvasValid = false;
+                },
+                true
+        );
+        this.keyHook(
+                [xCanvas.getKey('aleft')],
+                function() {
+                    if (xCanvas.mySel && xCanvas.mySel.x > 0) {
+                        xCanvas.mySel.x--;
+                        xCanvas.canvasValid = false;
+                    }
+                },
+                true
+        );
+        this.keyHook(
+                [xCanvas.getKey('aup')],
+                function() {
+                    if (xCanvas.mySel && xCanvas.mySel.y > 0) {
+                        xCanvas.mySel.y--;
+                        xCanvas.canvasValid = false;
+                    }
+                },
+                true
+        );
+        this.keyHook(
+                [xCanvas.getKey('aright')],
+                function() {
+                    if (xCanvas.mySel
+                            && xCanvas.mySel.x + xCanvas.mySel.width < xCanvas.canvasSize.width) {
+                        xCanvas.mySel.x++;
+                        xCanvas.canvasValid = false;
+                    }
+                },
+                true
+        );
+        this.keyHook(
+                [xCanvas.getKey('adown')],
+                function() {
+                    if (xCanvas.mySel
+                            && xCanvas.mySel.y + xCanvas.mySel.height < xCanvas.canvasSize.height) {
+                        xCanvas.mySel.y++;
+                        xCanvas.canvasValid = false;
+                    }
+                },
+                true
+        );
+        this.keyHook(
+                [xCanvas.getKey('delete')],
+                function() {
+                    xCanvas.removeShape();
+                }
+        );
+    };
+    xCanvas.init("canvas", {width: window.innerWidth, height: window.innerHeight-50, interval:16}, init).mouseDblClick(function(e){
+        var mouse = getMouse(e);
+        var width = 30;
+        var height = 30;
+        xCanvas.addShape(new Shape({x: mouse.x - (width / 2), y: mouse.y - (height / 2), width: width, height: height, selectable: true, resizable:true, fill: 'rgba(220,205,65,0.7)'}));
+    });
+
+
+    var response = null;
+        preloader.init(function (data) {
+            xCanvas.run();
+            xCanvas.addShape(new Shape({x: 0, y: 0, width: 100, height: 100, image: data['elephant'], selectable: true, dragable: true}));
+            xCanvas.addShape(
+                new Shape(
+                    {
+                        alias: 'dog',
+                        x: 200,
+                        y: 200,
+                        width: 100,
+                        height: 100,
+                        image: data['dog'],
+                        selectable: true,
+                        dragable: true,
+                        resizable: true,
+                        click: function() {
+                            console.log("I'm event clicked on element");
+                        },
+                        hover: {
+                            image: data['elephant']
+                        },
+                        mousemove: function() {
+                            console.log("hover...");
+                        }
+                    }
+                )
+            );
+        });
+    preloader.loadImage({src: 'shape126.png', alias: 'dog'});
+    preloader.loadImage({src: 'elephant.png', alias: 'elephant'});
+        //preloader.loadSong({src: 'druj.*', alias: 'druj'});
+        preloader.log = true;
+
+    // add a large green rectangle
+    xCanvas.addShape(new Shape({x: 260, y: 70, width: 60, height: 65, fill: 'rgba(0,205,0,0.7)', selectable: true, dragable: true}));
+    // add a green-blue rectangle
+    xCanvas.addShape(new Shape({x: 240, y: 120, width: 40, height: 40, fill: 'rgba(2,165,165,0.7)'}));
+    // add a smaller purple rectangle
+    xCanvas.addShape(new Shape({x: 45, y: 60, width: 25, height: 25, fill: 'rgba(150,150,250,0.7)'}));
+
+    fileLoader('files', 'image', function (img, f) {
+        if (xCanvas.canvasSize.height < img.height) {
+            xCanvas.canvasSize.height = img.height;
+            xCanvas.refreshCanvasSize();
+        }
+        if (xCanvas.canvasSize.width < img.width) {
+            xCanvas.canvasSize.width = img.width;
+            xCanvas.refreshCanvasSize();
+        }
+        console.log(img.height, xCanvas.canvasSize.height);
+        xCanvas.addShape(
+            new Shape(
+                {
+                    alias: f.name,
+                    x: 0,
+                    y: 0,
+                    image: img,
+                    selectable: true,
+                    dragable: true,
+                    resizable:true
+                }
+            )
+        );
+    });
+
+    //generate css
+    document.getElementById('getCss').onclick = function () {
+        var shapes = xCanvas.getShapes();
+        var x = y = 0;
+        var i = 0;
+        var css = '';
+        for (var shape in shapes) {
+            i++;
+            if (shapes[shape].name === undefined) {
+                css += '//\n';
+            } else {
+                css += '//' + shapes[shape].name + '\n';
+            }
+            css += '.image' + i + ' {\n';
+            css += '    background: url("sprite.png") no-repeat transparent;\n';
+            css += '    width: ' + shapes[shape].width + 'px;\n';
+            css += '    height: ' + shapes[shape].height + 'px;\n';
+            if (shapes[shape].x > 0) {
+                x = '-' + shapes[shape].x;
+            } else {
+                x = 0;
+            }
+            if (shapes[shape].y > 0) {
+                y = '-' + shapes[shape].y;
+            } else {
+                y = 0;
+            }
+
+            css += '    background-position: ' + x + 'px ' + y + 'px;\n';
+            css += '}\n';
+        }
+        document.getElementById('output-css').innerHTML = css;
+    };
+
+    //get shapes coordinates
+    document.getElementById('getCanvas').onclick = function () {
+        var shapes = xCanvas.getShapes();
+        var sprite = '';
+        for (var shape in shapes) {
+            if (shapes[shape].name === undefined) {
+                sprite += '//\n';
+            } else {
+                sprite += '//' + shapes[shape].name + '\n';
+            }
+
+            sprite += '(' + shapes[shape].x + ', ' + shapes[shape].y + ', ' + shapes[shape].width + ', ' + shapes[shape].height + ');\n';
+        }
+        document.getElementById('output-sprite').innerHTML = sprite;
+    };
+
+    //save to canvas
+    document.getElementById('toPng').onclick = function () {
+        window.open(xCanvas.getDataURL());
+    };
+
+
+    document.getElementById('clear').onclick = function () {
+        xCanvas.removeAllShapes();
+    };
+
+    document.getElementById('align').onclick = function () {
+        xCanvas.alignShapes();
+    };
+
+    document.getElementById('crop').onclick = function () {
+        xCanvas.crop = true;
+    };
+
+</script>
+</body>
+</html>

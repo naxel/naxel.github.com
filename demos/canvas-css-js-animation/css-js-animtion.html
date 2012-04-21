@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>CSS-JS-Animation</title>
+<style>
+body{
+	background-color:#333333;
+}
+.conteiner {
+	height: 68px;
+    left: 143px;
+    overflow: hidden;
+    position: absolute;
+    top: 38px;
+    width: 75px;
+	border-radius: 15px 15px 15px 15px;
+    -o-border-radius: 15px 15px 15px 15px;
+    -moz-border-radius: 15px 15px 15px 15px;
+    -webkit-border-radius: 15px 15px 15px 15px;
+}
+#gun{
+	border-radius: 15px 15px 15px 15px;
+    -o-border-radius: 15px 15px 15px 15px;
+    -moz-border-radius: 15px 15px 15px 15px;
+    -webkit-border-radius: 15px 15px 15px 15px;
+}
+</style>
+</head>
+<body>
+<img src="fon.png" />
+<div class="conteiner"><div id="gun"></div></div>
+<div id="ship"></div>
+
+<script>
+var styles = {};
+styles.cursor = 'pointer';
+styles.width = '75px';
+styles.height = '75px';
+var elementId = 'gun';
+var imgName = 'canvas.png';
+
+spriteAnimation(elementId, imgName, styles);
+spriteAnimation('ship', 'ship.png', styles);
+
+function spriteAnimation(elementId, imgName, styles) {
+	
+	var img = document.createElement('img');
+	var offset = 0;
+	img.onload = function () {
+		var element = document.getElementById(elementId);
+		element.style.cursor     = styles.cursor;
+		element.style.width      = styles.width;
+		element.style.height     = styles.height;
+		element.style.background = "url('" + imgName + "') " + offset + "px 50%";
+		var i = 0;
+		element.onmouseover = function() {
+			interval = setInterval(function() {
+				if (offset < img.width) {
+					i++;
+				} else {
+					i = 0;
+				}
+				offset = 75 * i;
+				element.style.background = "url('" + imgName + "') " + offset + "px 50%"; 
+			} , 1000/24)
+		};
+		element.onmouseout = function() {
+			clearInterval(interval)
+		};
+	};
+	img.src = imgName;
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>xCanvas. Demo: Animation</title>
+    <script src="../preload/preloader.js"></script>
+    <script src="../xcanvas/main.js"></script>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+            background-color: #000000;
+        }
+    </style>
+</head>
+<body>
+<canvas id="canvas" height="400" width="400"></canvas>
+
+<script>
+    xCanvas.init("canvas", {width: window.innerWidth, height: window.innerHeight-5, interval:1000/24, animation:true});
+
+    xCanvas.ctx.fillStyle = "#000";
+    xCanvas.ctx.fillRect(0, 0, xCanvas.canvasSize.width, xCanvas.canvasSize.height);
+
+    xCanvas.ctx.fillStyle = "#FFF";
+    xCanvas.ctx.textBaseline = "top";
+    xCanvas.ctx.font = "32pt Calibri";
+    var text = "Loading...";
+    var marginLeft = xCanvas.canvasSize.width/2 - xCanvas.ctx.measureText(text).width;
+    var marginTop = xCanvas.canvasSize.height/2 - xCanvas.getFontHeight(xCanvas.ctx.font);
+    xCanvas.ctx.fillText(text, marginLeft, marginTop);
+
+    var response = null;
+    preloader.init(function (data) {
+
+        xCanvas.addFunc(
+            function () {
+
+                var centerX = xCanvas.canvasSize.width / 2;
+                var centerY = xCanvas.canvasSize.height / 2;
+
+                var asteroid = xCanvas.getShape('asteroid');
+                var al0 = 200;
+                asteroid.angle += 3;
+                if (asteroid.angle >= 360) {
+                    asteroid.angle = 0;
+                }
+                asteroid.x = al0 * Math.sin(xCanvas.toRadians(90 - asteroid.angle)) + centerX;
+                asteroid.y = al0 * Math.sin(xCanvas.toRadians(asteroid.angle)) + centerY;
+
+                var asteroid1 = xCanvas.getShape('asteroid1');
+                var al1 = 400;
+                asteroid1.angle += 0.5;
+                if (asteroid1.angle <= 0) {
+                    asteroid1.angle = 360;
+                }
+                asteroid1.x = al1 * Math.sin(xCanvas.toRadians(90 - asteroid1.angle)) + centerX;
+                asteroid1.y = al1 * Math.sin(xCanvas.toRadians(asteroid1.angle)) + centerY;
+                var asteroid2 = xCanvas.getShape('asteroid2');
+                var al2 = 300;
+                asteroid2.angle -= 1;
+                if (asteroid2.angle <= 0) {
+                    asteroid2.angle = 360;
+                }
+                asteroid2.x = al2 * Math.sin(xCanvas.toRadians(90 - asteroid2.angle)) + centerX;
+                asteroid2.y = al2 * Math.sin(xCanvas.toRadians(asteroid2.angle)) + centerY;
+            }
+        ).run();
+
+        xCanvas.addShape(
+            new Shape(
+                {
+                    alias: 'bg',
+                    x: 0,
+                    y: 0,
+                    width: xCanvas.canvasSize.width,
+                    height: xCanvas.canvasSize.height,
+                    image: data['bg']
+                }
+            )
+        );
+        xCanvas.addShape(
+            new Shape(
+                {
+                    alias: 'bad_friesbee',
+                    x: 100,
+                    y: 100,
+                    align: 70,
+                    orginWidth: 60,
+                    orginHeight: 17,
+                    width: 80,
+                    height: 30,
+                    selectable: true,
+                    dragable: true,
+                    resizable: true,
+                    image: data['bad_friesbee'],
+                    hover: {
+                        orginWidth: 70,
+                        align: 0
+                    },
+                    mousemove: function () {
+                        console.log("hover...");
+                    }
+                }
+            )
+        );
+
+        xCanvas.addShape(
+            new Shape(
+                {
+                    alias: 'star',
+                    x: xCanvas.canvasSize.width / 2 - 150,
+                    y: xCanvas.canvasSize.height / 2 - 150,
+                    align: 0,
+                    sprites: 101,
+                    //reversAnimation: true,
+                    orginWidth: 150,
+                    orginHeight: 150,
+                    width: 300,
+                    height: 300,
+                    image: data['star']
+                }
+            )
+        );
+
+        xCanvas.addShape(
+            new Shape(
+                {
+                    alias: 'asteroid',
+                    x: 500,
+                    y: 500,
+                    align: 480,
+                    sprites: 100,
+                    orginWidth: 48,
+                    orginHeight: 48,
+                    width: 60,
+                    height: 60,
+                    selectable: true,
+                    dragable: true,
+                    resizable: true,
+                    image: data['asteroid'],
+                    angle: Math.floor(Math.random() * (360 - 1 + 1)) + 1
+                }
+            )
+        );
+
+        xCanvas.addShape(
+            new Shape(
+                {
+                    alias: 'asteroid2',
+                    x: 500,
+                    y: 500,
+                    align: 0,
+                    sprites: 81,
+                    orginWidth: 48,
+                    orginHeight: 48,
+                    width: 60,
+                    height: 60,
+                    image: data['asteroid2'],
+                    angle: Math.floor(Math.random() * (360 - 1 + 1)) + 1
+                }
+            )
+        );
+
+        xCanvas.addShape(
+            new Shape(
+                {
+                    alias: 'asteroid1',
+                    x: 500,
+                    y: 500,
+                    align: 0,
+                    sprites: 81,
+                    orginWidth: 48,
+                    orginHeight: 48,
+                    width: 75,
+                    height: 75,
+                    image: data['asteroid1'],
+                    angle: Math.floor(Math.random() * (360 - 1 + 1)) + 1
+                }
+            )
+        );
+        response = data;
+    });
+
+    preloader.loadImage({src: 'bad_friesbee.png', alias: 'bad_friesbee'});
+    preloader.loadImage({src: 'star.png', alias: 'star'});
+    preloader.loadImage({src: 'asteroid.png', alias: 'asteroid'});
+    preloader.loadImage({src: 'asteroid1.png', alias: 'asteroid1'});
+    preloader.loadImage({src: 'asteroid2.png', alias: 'asteroid2'});
+    preloader.loadImage({src: '1bg.png', alias: 'bg'});
+    //preloader.loadSong({src: 'druj.*', alias: 'druj'});
+    preloader.log = true;
+</script>
+</body>
+</html>

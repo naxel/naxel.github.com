@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Canvas-rate sprite</title>
+<style>
+body{
+	background-color:#333333;
+}
+</style>
+</head>
+<body>
+<canvas id="sprite">Не поддерживается</canvas>
+<script>
+var first = '000';
+var last  = 49;
+var num   = 0;
+
+var maskFileName = ['2HULL_PEOPLE_P_A_', '.png'];
+var dir = 'ship';
+
+var canvas = document.getElementById("sprite");
+canvas.width  = (last + 1) * 75;
+canvas.height = 75;
+var width = 0;
+var context = canvas.getContext("2d");
+
+function zerofikator(num, length) {
+	var prefix = '';
+	for (var i = num.toString().length; i < length; i++) {
+		prefix += '0';
+	}
+	return prefix + num;
+}
+
+function draw() {
+	var img = document.createElement('img');
+	img.onload = function () {
+
+			  	context.drawImage(img, width, 0);
+			  	width += 75;
+			  	if (zerofikator(num, first.length) != zerofikator(last, first.length)) {
+			  		num++;
+			  		draw();
+			  	}
+	};
+	img.src = dir + '/' + maskFileName[0] + zerofikator(num, first.length) + maskFileName[1];
+}
+
+draw();
+
+</script>
+</body>
+</html>
