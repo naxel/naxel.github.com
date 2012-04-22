@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>xCanvas. Demo: Animation</title>
+    <script src="../preload/preloader.js"></script>
+    <script src="../xcanvas/main.js"></script>
+    <script src="ship.js"></script>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+            background-color: #000000;
+        }
+    </style>
+</head>
+<body>
+<canvas id="canvas" height="400" width="400"></canvas>
+
+<script>
+    xCanvas.init("canvas", {width: window.innerWidth, height: window.innerHeight-5, interval:1000/24, animation:true});
+
+    xCanvas.ctx.fillStyle = "#000";
+    xCanvas.ctx.fillRect(0, 0, xCanvas.canvasSize.width, xCanvas.canvasSize.height);
+
+    xCanvas.ctx.fillStyle = "#FFF";
+    xCanvas.ctx.textBaseline = "top";
+    xCanvas.ctx.font = "32pt Calibri";
+    var text = "Loading...";
+    var marginLeft = xCanvas.canvasSize.width/2 - xCanvas.ctx.measureText(text).width;
+    var marginTop = xCanvas.canvasSize.height/2 - xCanvas.getFontHeight(xCanvas.ctx.font);
+    xCanvas.ctx.fillText(text, marginLeft, marginTop);
+
+    var response = null;
+    preloader.init(function (data) {
+
+        xCanvas.listenKeyboard().addFunc(
+            function () {
+                var angle = 0;
+                var ship = xCanvas.getShape('feiws');
+
+                if (this.isPressKey('aleft') && this.isPressKey('adown')) {
+                    if (ship.angle == 0) {
+                        ship.angle = 360;
+                    }
+                    ship.angle += 10;
+                    if (ship.speed < ship.forwardSpeed) {
+                        ship.forwardSpeed--;
+                    }
+                } else if (this.isPressKey('aleft')) {
+                    if (ship.angle == 0) {
+                        ship.angle = 360;
+                    }
+                    ship.angle -= 10;
+                    if (ship.speed < ship.forwardSpeed) {
+                        ship.forwardSpeed--;
+                    }
+
+                }
+                if (this.isPressKey('aright') && this.isPressKey('adown')) {
+
+                    if (ship.angle == 360) {
+                        ship.angle = 0;
+                    }
+                    ship.angle -= 10;
+                    if (ship.speed < ship.forwardSpeed) {
+                        ship.forwardSpeed--;
+                    }
+                } else if (this.isPressKey('aright')) {
+                    if (ship.angle == 360) {
+                        ship.angle = 0;
+                    }
+                    ship.angle += 10;
+                    if (ship.speed < ship.forwardSpeed) {
+                        ship.forwardSpeed--;
+                    }
+                }
+                if (this.isPressKey('aup')) {
+                    if (ship.forwardSpeed < ship.maxForwardSpeed) {
+                        ship.forwardSpeed++;
+                    }
+                    if (ship.angle < 90) {
+                        ship.x = ship.x + ship.forwardSpeed * Math.sin(xCanvas.toRadians(ship.angle));
+                        ship.y = ship.y - ship.forwardSpeed * Math.sin(xCanvas.toRadians(90 - ship.angle));
+                    } else if (90 <= ship.angle && ship.angle < 180) {
+                        angle = ship.angle - 90;
+                        ship.x = ship.x + ship.forwardSpeed * Math.sin(xCanvas.toRadians(90 - angle));
+                        ship.y = ship.y + ship.forwardSpeed * Math.sin(xCanvas.toRadians(angle));
+                    } else if (180 <= ship.angle && ship.angle < 270) {
+                        angle = ship.angle - 180;
+                        ship.x = ship.x - ship.forwardSpeed * Math.sin(xCanvas.toRadians(angle));
+                        ship.y = ship.y + ship.forwardSpeed * Math.sin(xCanvas.toRadians(90 - angle));
+                    } else if (ship.angle >= 270) {
+                        angle = ship.angle - 270;
+                        ship.x = ship.x - ship.forwardSpeed * Math.sin(xCanvas.toRadians(90 - angle));
+                        ship.y = ship.y - ship.forwardSpeed * Math.sin(xCanvas.toRadians(angle));
+                    }
+                }
+                if (this.isPressKey('adown')) {
+                    ship.forwardSpeed = ship.speed;
+                    if (ship.angle < 90) {
+                        ship.x = ship.x - ship.backSpeed * Math.sin(xCanvas.toRadians(ship.angle));
+                        ship.y = ship.y + ship.backSpeed * Math.sin(xCanvas.toRadians(90 - ship.angle));
+                    } else if (90 <= ship.angle && ship.angle < 180) {
+                        angle = ship.angle - 90;
+                        ship.x = ship.x - ship.backSpeed * Math.sin(xCanvas.toRadians(90 - angle));
+                        ship.y = ship.y - ship.backSpeed * Math.sin(xCanvas.toRadians(angle));
+                    } else if (180 <= ship.angle && ship.angle < 270) {
+                        angle = ship.angle - 180;
+                        ship.x = ship.x + ship.backSpeed * Math.sin(xCanvas.toRadians(angle));
+                        ship.y = ship.y - ship.backSpeed * Math.sin(xCanvas.toRadians(90 - angle));
+                    } else if (ship.angle >= 270) {
+                        angle = ship.angle - 270;
+                        ship.x = ship.x + ship.backSpeed * Math.sin(xCanvas.toRadians(90 - angle));
+                        ship.y = ship.y + ship.backSpeed * Math.sin(xCanvas.toRadians(angle));
+                    }
+                }
+                /*var centerX = xCanvas.canvasSize.width / 2;
+                var centerY = xCanvas.canvasSize.height / 2;
+
+                var asteroid = xCanvas.getShape('asteroid');
+                var al0 = 200;
+                asteroid.angle += 3;
+                if (asteroid.angle >= 360) {
+                    asteroid.angle = 0;
+                }
+                asteroid.x = al0 * Math.sin(xCanvas.toRadians(90 - asteroid.angle)) + centerX;
+                asteroid.y = al0 * Math.sin(xCanvas.toRadians(asteroid.angle)) + centerY;
+
+                var asteroid1 = xCanvas.getShape('asteroid1');
+                var al1 = 400;
+                asteroid1.angle += 0.5;
+                if (asteroid1.angle <= 0) {
+                    asteroid1.angle = 360;
+                }
+                asteroid1.x = al1 * Math.sin(xCanvas.toRadians(90 - asteroid1.angle)) + centerX;
+                asteroid1.y = al1 * Math.sin(xCanvas.toRadians(asteroid1.angle)) + centerY;
+                var asteroid2 = xCanvas.getShape('asteroid2');
+                var al2 = 300;
+                asteroid2.angle -= 1;
+                if (asteroid2.angle <= 0) {
+                    asteroid2.angle = 360;
+                }
+                asteroid2.x = al2 * Math.sin(xCanvas.toRadians(90 - asteroid2.angle)) + centerX;
+                asteroid2.y = al2 * Math.sin(xCanvas.toRadians(asteroid2.angle)) + centerY;*/
+            }
+        ).run();
+
+        xCanvas.addShape(
+            new Shape(
+                {
+                    alias: 'bg',
+                    x: 0,
+                    y: 0,
+                    width: xCanvas.canvasSize.width,
+                    height: xCanvas.canvasSize.height,
+                    image: data['bg']
+                }
+            )
+        );
+
+        xCanvas.addShape(
+            new Shape(
+                {
+                    alias: 'cistern',
+                    x: xCanvas.canvasSize.width / 2 - 150,
+                    y: xCanvas.canvasSize.height / 2 - 150,
+                    align: 0,
+                    sprites: 100,
+                    //reversAnimation: true,
+                    orginWidth: 25,
+                    orginHeight: 25,
+                    width: 25,
+                    height: 25,
+                    image: data['cistern']
+                }
+            )
+        );
+
+        xCanvas.addShape(
+            new ShipShape(
+                {
+                    alias: 'feiws',
+                    x: 100,
+                    y: 100,
+                    align: 0,
+                    sprites: 50,
+                    orginWidth: 128,
+                    orginHeight: 128,
+                    width: 80,
+                    height: 80,
+                    image: data['feiws']
+                }
+            )
+        );
+
+        response = data;
+    });
+
+    preloader.loadImage({src: 'feiws.png', alias: 'feiws'});
+    preloader.loadImage({src: 'malocrs.png', alias: 'malocrs'});
+    preloader.loadImage({src: 'cistern.png', alias: 'cistern'});
+    /*preloader.loadImage({src: 'asteroid.png', alias: 'asteroid'});
+    preloader.loadImage({src: 'asteroid1.png', alias: 'asteroid1'});
+    preloader.loadImage({src: 'asteroid2.png', alias: 'asteroid2'});*/
+    preloader.loadImage({src: '1bg.png', alias: 'bg'});
+    //preloader.loadSong({src: 'druj.*', alias: 'druj'});
+    preloader.log = true;
+</script>
+</body>
+</html>

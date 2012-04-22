@@ -31,11 +31,8 @@
 <pre id="output-sprite"></pre>
 
 <script>
-    //init();
-
-    var init = function(){
-
-        console.log('I am run!');
+    var init = function() {
+        //console.log('I am run!');
         var title = document.getElementsByTagName('title')[0];
         title.innerHTML += this.version;
 
@@ -195,6 +192,8 @@
     xCanvas.addShape(new Shape({x: 240, y: 120, width: 40, height: 40, fill: 'rgba(2,165,165,0.7)'}));
     // add a smaller purple rectangle
     xCanvas.addShape(new Shape({x: 45, y: 60, width: 25, height: 25, fill: 'rgba(150,150,250,0.7)'}));
+
+    xCanvas.addShape(new CircleShape({x: 200, y: 100, width: 100, height: 100, selectable: true, resizable:true, dragable: true, fill: 'rgba(220,205,65,0.7)'}));
 
     fileLoader('files', 'image', function (img, f) {
         if (xCanvas.canvasSize.height < img.height) {

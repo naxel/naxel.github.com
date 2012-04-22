@@ -4,7 +4,7 @@
  */
 var xCanvas = {
 
-    version: '0.0.4.0',
+    version: '0.0.4.1',
 
     APPLICATION_ENV: 'development',//'production'//'testing'//'development'
 
@@ -499,7 +499,6 @@ var xCanvas = {
                 var imageData = xCanvas.gctx.getImageData(mouse.x, mouse.y, 1, 1);
                 // if the mouse pixel exists, select and break
                 if (imageData.data[3] > 0) {
-
                     if (xCanvas.shapes[i].click) {
                         xCanvas.shapes[i].click();
                     }
@@ -560,7 +559,6 @@ var xCanvas = {
             var isCheck = false;
 
             for (var combo in xCanvas.combArray) {
-
                 for (var i = 0; i < xCanvas.combArray[combo].keys.length; i++) { // проверить, все ли клавиши нажаты
                     if (pressed[xCanvas.combArray[combo].keys[i]]) {
                         isCheck = true;
@@ -583,6 +581,23 @@ var xCanvas = {
             e = e || window.event;
             delete pressed[e.keyCode];
         };
+    },
+    pressed: [],
+    listenKeyboard: function() {
+        document.onkeydown = function(e) {
+            e = e || window.event;
+
+            xCanvas.pressed[e.keyCode] = true;
+
+        };
+        document.onkeyup = function(e) {
+            e = e || window.event;
+            xCanvas.pressed[e.keyCode] = false;
+        };
+        return this;
+    },
+    isPressKey: function(key) {
+        return this.pressed[this.getKey(key)];
     },
 
     //get radians by degrees
@@ -670,15 +685,21 @@ function getMouse(e) {
         y: e.pageY - xCanvas.offsetY
     };
 }
+
 //shape object
 function Shape(options) {
-    this.num = 0;
-    this.sprites = null;
-    this.align = null;
+    this.alias = null;
     this.x = 0;
     this.y = 0;
     this.width = 1;
     this.height = 1;
+
+    this.fill = '#AAAAAA';
+    this.angle = 0;
+    this.image = null;
+    this.sprites = null;
+    this.align = null;
+
     this.click = null;
     this.hover = null;
     this.mousemove = null;
@@ -688,11 +709,6 @@ function Shape(options) {
     this.resizable = false;
     this.reversAnimation = false;
     this.reversed = false;
-
-    this.fill = '#AAAAAA';
-    this.angle = 0;
-    this.image = null;
-    this.alias = null;
 
     if (options.image !== undefined) {
         this.image = options.image;
@@ -927,6 +943,146 @@ Shape.prototype = {
     }
 };
 
+//create circles
+function CircleShape(options) {
+    this.x = 0;
+    this.y = 0;
+    this.radius = 1;
+    this.alias = null;
+    this.height = 5;
+    this.width = 5;
+
+    this.fill = '#AAAAAA';
+    this.stroke = "black";
+    this.lineWidth = 1;
+
+    this.click = null;
+    this.hover = null;
+    this.mousemove = null;
+    this.onhover = false;
+    this.selectable = false;
+    this.dragable = false;
+    this.resizable = false;
+
+    if (options.alias !== undefined) {
+        this.alias = options.alias;
+    }
+    if (options.radius !== undefined) {
+        this.radius = options.radius;
+    }
+    if (options.x !== undefined) {
+        this.x = options.x;
+    }
+    if (options.y !== undefined) {
+        this.y = options.y;
+    }
+    if (options.height !== undefined) {
+        this.height = options.height;
+    }
+    if (options.width !== undefined) {
+        this.width = options.width;
+    }
+    if (options.fill !== undefined) {
+        this.fill = options.fill;
+    }
+    if (options.stroke !== undefined) {
+        this.stroke = options.stroke;
+    }
+    if (options.lineWidth !== undefined) {
+        this.lineWidth = options.lineWidth;
+    }
+
+    if (options.click !== undefined) {
+        this.click = options.click;
+    }
+    if (options.hover !== undefined) {
+        this.hover = options.hover;
+    }
+    if (options.mousemove !== undefined) {
+        this.mousemove = options.mousemove;
+    }
+
+    if (options.selectable !== undefined) {
+        this.selectable = options.selectable;
+        if (options.dragable !== undefined) {
+            this.dragable = options.dragable;
+        }
+        if (options.resizable !== undefined) {
+            this.resizable = options.resizable;
+        }
+    }
+
+    this.draw = function(context) {
+
+        if (context === xCanvas.gctx) {
+            context.fillStyle = 'black'; // always want black for the ghost canvas
+        } else {
+            context.fillStyle = this.fill;
+        }
+
+        // We can skip the drawing of elements that have moved off the screen:
+        if (this.x > xCanvas.canvasSize.width || this.y > xCanvas.canvasSize.height) return;
+        if (this.x + this.width < 0 || this.y + this.height < 0) return;
+
+        context.beginPath();
+        context.arc(this.x + this.width / 2 , this.y + this.height / 2, this.width / 2, 0, 2 * Math.PI, false);
+        context.fill();
+        context.lineWidth = this.lineWidth;
+        context.strokeStyle = this.stroke;
+        context.stroke();
+
+        // draw selection
+        // this is a stroke along the box and also 8 new selection handles
+        if (xCanvas.mySel === this) {
+            context.strokeStyle = xCanvas.mySelColor;
+            context.lineWidth = xCanvas.mySelWidth;
+            context.strokeRect(this.x, this.y, this.width, this.height);
+
+            // draw the boxes
+
+            var half = xCanvas.mySelBoxSize / 2;
+
+            // 0  1  2
+            // 3     4
+            // 5  6  7
+
+            // top left, middle, right
+            xCanvas.selectionHandles[0].x = this.x - half;
+            xCanvas.selectionHandles[0].y = this.y - half;
+
+            xCanvas.selectionHandles[1].x = this.x + this.width / 2 - half;
+            xCanvas.selectionHandles[1].y = this.y - half;
+
+            xCanvas.selectionHandles[2].x = this.x + this.width - half;
+            xCanvas.selectionHandles[2].y = this.y - half;
+
+            //middle left
+            xCanvas.selectionHandles[3].x = this.x - half;
+            xCanvas.selectionHandles[3].y = this.y + this.height / 2 - half;
+
+            //middle right
+            xCanvas.selectionHandles[4].x = this.x + this.width - half;
+            xCanvas.selectionHandles[4].y = this.y + this.height / 2 - half;
+
+            //bottom left, middle, right
+            xCanvas.selectionHandles[6].x = this.x + this.width / 2 - half;
+            xCanvas.selectionHandles[6].y = this.y + this.height - half;
+
+            xCanvas.selectionHandles[5].x = this.x - half;
+            xCanvas.selectionHandles[5].y = this.y + this.height - half;
+
+            xCanvas.selectionHandles[7].x = this.x + this.width - half;
+            xCanvas.selectionHandles[7].y = this.y + this.height - half;
+
+
+            context.fillStyle = xCanvas.mySelBoxColor;
+            for (var i = 0; i < 8; i++) {
+                var cur = xCanvas.selectionHandles[i];
+                context.fillRect(cur.x, cur.y, xCanvas.mySelBoxSize, xCanvas.mySelBoxSize);
+            }
+        }
+    };
+}
 
 /*
 Load files
