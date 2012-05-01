@@ -4,7 +4,7 @@
  */
 var xCanvas = {
 
-    version: '0.0.4.1',
+    version: '0.0.4.2',
 
     APPLICATION_ENV: 'development',//'production'//'testing'//'development'
 
@@ -145,14 +145,22 @@ var xCanvas = {
         this.canvasValid = false;
     },
     //remove selected shape
-    removeShape: function () {
+    removeShape: function (alias) {
+
         var data = this.shapes;
         var l = this.shapes.length;
         this.shapes = [];
         for (var i = 0; i < l; i++) {
-            if (this.mySel != data[i]) {
-                this.shapes.push(data[i]);
+            if (alias !== undefined) {
+                if (alias != data[i].alias) {
+                    this.shapes.push(data[i]);
+                }
+            } else {
+                if (this.mySel != data[i]) {
+                    this.shapes.push(data[i]);
+                }
             }
+
         }
         this.mySel = null;
         this.canvasValid = false;
@@ -388,8 +396,13 @@ var xCanvas = {
                         break;
                     case 7:
                         if (mouse.x - oldx > minSize && mouse.y - oldy > minSize) {
-                            xCanvas.mySel.width = mouse.x - oldx;
-                            xCanvas.mySel.height = mouse.y - oldy;
+                            if (xCanvas.isPressKey('shift')) {
+                                xCanvas.mySel.width = mouse.x - oldx;
+                                xCanvas.mySel.height = mouse.x - oldx;
+                            } else {
+                                xCanvas.mySel.width = mouse.x - oldx;
+                                xCanvas.mySel.height = mouse.y - oldy;
+                            }
                         }
                         break;
                 }

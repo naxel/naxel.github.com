@@ -25,6 +25,8 @@
     <input type="button" id="getCss" value="Get CSS">
     <input type="button" id="getCanvas" value="Get Coordinates">
     <input type="button" id="toPng" value="To PNG">
+    <input type="button" id="mask" value="Add Circle mask">
+    <input type="button" id="getMask" value="Crop Circle mask">
 </p>
 <canvas id="canvas" height="800" width="800"></canvas>
 <pre id="output-css"></pre>
@@ -149,7 +151,7 @@
         var width = 30;
         var height = 30;
         xCanvas.addShape(new Shape({x: mouse.x - (width / 2), y: mouse.y - (height / 2), width: width, height: height, selectable: true, resizable:true, fill: 'rgba(220,205,65,0.7)'}));
-    });
+    }).listenKeyboard();
 
 
     var response = null;
@@ -286,6 +288,52 @@
 
     document.getElementById('crop').onclick = function () {
         xCanvas.crop = true;
+    };
+
+    document.getElementById('mask').onclick = function () {
+        xCanvas.addShape(new CircleShape({alias:'mask', x: 300, y: 300, width: 100, height: 100, selectable: true, resizable:true, dragable: true, fill: 'rgba(220,205,65,0.0)'}));
+    };
+
+    document.getElementById('getMask').onclick = function () {
+
+        var mask = xCanvas.getShape('mask');
+        xCanvas.removeShape('mask');
+
+        xCanvas.mySel = null;
+        xCanvas.canvasValid = false;
+        xCanvas.drawingLoop();
+
+        var imageData = xCanvas.ctx.getImageData(mask.x, mask.y, mask.width, mask.height);
+        var canvas = document.createElement("canvas");
+        canvas.height = mask.height;
+        canvas.width = mask.width;
+        var ctx = canvas.getContext("2d");
+
+        ctx.putImageData(imageData, 0, 0); // выводим изображение
+
+        ctx.globalCompositeOperation = 'destination-in';
+        ctx.fillStyle = "#ff00ff";
+        ctx.beginPath();
+        ctx.arc(0 + mask.width / 2 , 0 + mask.height / 2, mask.width / 2, 0, 2 * Math.PI, false);
+        ctx.fill();
+        var scrImg = canvas.toDataURL('image/png');
+        var img = new Image;
+        img.onload = function(){
+            xCanvas.addShape(
+                new Shape(
+                    {
+                        alias: 'circle',
+                        x: mask.x,
+                        y: mask.y,
+                        image: img,
+                        selectable: true,
+                        dragable: true,
+                        resizable: true
+                    }
+                )
+            );
+        };
+        img.src = scrImg;
     };
 
 </script>
