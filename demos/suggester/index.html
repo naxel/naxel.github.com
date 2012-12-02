@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="suggester.css">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script src="jquery.suggester.js"></script>
+    <title>Jquery plugin Suggester Demo</title>
+    <style>
+
+    </style>
+</head>
+<body>
+
+<div style="width: 450px; margin: auto;">
+    <input type="text" name="colors" id="colorSuggester" value=""/>
+    <input type="text" name="colors" id="colorSuggester2" style="width: 300px;" value=""/>
+</div>
+
+
+<script type="text/javascript">
+    $(function() {
+
+        var colors = [
+            {"color": "black"},
+            {"color": "gray"},
+            {"color": "silver"},
+            {"color": "white"},
+            {"color": "maroon"},
+            {"color": "red"},
+            {"color": "purple"},
+            {"color": "fuchsia"},
+            {"color": "green"},
+            {"color": "lime"},
+            {"color": "olive"},
+            {"color": "yellow"},
+            {"color": "navy"},
+            {"color": "blue"},
+            {"color": "teal"},
+            {"color": "aqua"}
+        ];
+
+        $("#colorSuggester").suggester(colors, {
+            selectedItemProp: 'color',
+            searchObjProps: 'color',
+            selectedValuesProp: 'color',
+            startText: 'Enter Color Here',
+            minChars: 2,
+            srHtmlID: "myId1",
+            preFill: [
+                {"color": "red"},
+                {"color": "green"},
+                {"color": "blue"}
+            ]
+        });
+
+        $("#colorSuggester2").suggester(colors, {
+            selectedItemProp: 'color',
+            searchObjProps: 'color',
+            selectedValuesProp: 'color',
+            startText: 'Enter Color Here',
+            minChars: 1,
+            showAll: false,
+            srHtmlID: "myId2"
+        });
+    });
+
+</script>
+
+</body>
+</html>
