@@ -151,6 +151,7 @@ var xCanvas = {
         var l = this.shapes.length;
         this.shapes = [];
         for (var i = 0; i < l; i++) {
+
             if (alias !== undefined) {
                 if (alias != data[i].alias) {
                     this.shapes.push(data[i]);

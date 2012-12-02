@@ -146,12 +146,17 @@
                 }
         );
     };
-    xCanvas.init("canvas", {width: window.innerWidth, height: window.innerHeight-50, interval:16}, init).mouseDblClick(function(e){
+    xCanvas.init("canvas", {width: window.innerWidth, height: window.innerHeight-50, interval:16, animation:true}, init).mouseDblClick(function(e){
         var mouse = getMouse(e);
         var width = 30;
         var height = 30;
         xCanvas.addShape(new Shape({x: mouse.x - (width / 2), y: mouse.y - (height / 2), width: width, height: height, selectable: true, resizable:true, fill: 'rgba(220,205,65,0.7)'}));
-    }).listenKeyboard();
+    }).listenKeyboard().addFunc(
+            function() {
+                if (this.isPressKey('delete')) {
+                    xCanvas.removeShape();
+                }
+            });
 
 
     var response = null;
