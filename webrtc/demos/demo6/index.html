@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebRTC: RTCPeerConnection. Demo #6: Offer & Answer</title>
+    <script src="../../js/jquery-1.9.1.min.js"></script>
+    <script src="../../js/log.js"></script>
+    <script src="../../js/adapter.js"></script>
+</head>
+<body>
+<h1>WebRTC: RTCPeerConnection.</h1>
+
+<h2>Demo #6: Offer & Answer</h2>
+<textarea style="width: 100%; height: 200px;" id="output"></textarea>
+<script>
+    function runDemo() {
+        var mediaConstraints = {
+            'mandatory': {
+                'OfferToReceiveAudio': true,
+                'OfferToReceiveVideo': true
+            }
+        };
+
+        var pc1 = new RTCPeerConnection(null);
+        var pc2 = new RTCPeerConnection(null);
+
+        pc1.createOffer(function (sessionDescription) {
+            __log("Sending offer to peer.");
+            pc1.setLocalDescription(sessionDescription);
+            sendMessage(sessionDescription);
+        }, null, mediaConstraints);
+
+
+        function sendMessage(sessionDescription) {
+
+            __log("\nSession Description type: " + sessionDescription.type);
+            __log("Session Description:\n" + sessionDescription.sdp + "\n");
+
+            if (sessionDescription.type === 'offer') {
+                __log("Received offer from PC1.");
+                __log("   Waiting...");
+                if (confirm(webrtcDetectedBrowser + ' calling!')) {
+
+                    pc2.setRemoteDescription(new RTCSessionDescription(sessionDescription));
+
+                    __log("Sending answer to PC1.");
+                    pc2.createAnswer(function (sessionDescription) {
+
+                        pc2.setLocalDescription(sessionDescription);
+                        sendMessage(sessionDescription);
+
+                    }, null, mediaConstraints);
+
+                } else {
+                    alert("Canceled...");
+                    __log("Canceled...");
+                }
+
+            } else if (sessionDescription.type === 'answer') {
+                __log("Received answer from PC2.");
+                pc1.setRemoteDescription(new RTCSessionDescription(sessionDescription));
+                __log('Connection is established');
+            }
+        }
+    }
+</script>
+</body>
+</html>

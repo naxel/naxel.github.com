@@ -1,0 +1,24 @@
+{
+    "name": "TestWebRTC",
+    "description": "Example WebRTC",
+    "version": "0.0.1",
+    "engines": {
+        "node": ">= 0.8.0"
+    },
+    "dependencies": {
+        "socket.io": "latest",
+        "express": "2.5.1"
+    },
+    "subdomain": "TestWebRTC",
+    "scripts": {
+        "start": "app.js"
+    },
+    "author": "Alex Khaylo",
+    "contributors": [
+        {
+            "name": "Alex Khaylo",
+            "twitter": "naxel_",
+            "email": "naxel@land.ru"
+        }
+    ]
+}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>WebRTC: MediaStream. Demo #2: Video streams</title>
+    <script src="../../js/jquery-1.9.1.min.js"></script>
+    <script src="../../js/log.js"></script>
+    <script src="../../js/adapter.js"></script>
+</head>
+<body>
+<h1>WebRTC: MediaStream.</h1>
+
+<h2>Demo #2: Video streams</h2>
+<video id="webCam"></video>
+<textarea style="width: 100%; height: 200px;" id="output"></textarea>
+<script>
+    function runDemo() {
+        getUserMedia({
+            video: true,
+            audio: true
+        }, onSuccess, onError);
+
+        function onSuccess(stream) {
+            alert('Successful!');
+
+            var video = document.getElementById('webCam');
+            video.autoplay = true;
+
+            attachMediaStream(video, stream);
+            //code
+        }
+
+        function onError() {
+            alert('There has been a problem retrieving the streams - did you allow access?');
+        }
+    }
+</script>
+</body>
+</html>
+

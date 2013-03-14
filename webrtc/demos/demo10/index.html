@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebRTC: RtpDataChannel. Demo #10: RtpDataChannel</title>
+    <script src="../../js/jquery-1.9.1.min.js"></script>
+    <script src="../../js/log.js"></script>
+    <script src="../../js/adapter.js"></script>
+</head>
+<body>
+<h1>WebRTC: RtpDataChannel.</h1>
+
+<h2>Demo #10: RtpDataChannel</h2>
+<input type="text" value="test1" id="message1"/>
+<input type="button" id="send1" value="Send"/>
+<input type="text" value="test2" id="message2"/>
+<input type="button" id="send2" value="Send"/>
+
+<input type="button" id="call" value="Call"/>
+<textarea style="width: 100%; height: 200px;" id="output"></textarea>
+<script>
+    function runDemo() {
+        var media = {};
+        media.fake = media.audio = true;
+        var pcs = [], channels = [];
+        var servers = null;
+        var pcConstraints = {optional: [
+            {RtpDataChannels: true}
+        ]};
+
+        var port1 = Date.now();
+        var port2 = port1 + 1;
+
+        var callButton = document.getElementById('call');
+        callButton.addEventListener('click', call, false);
+
+        var send1Button = document.getElementById('send1');
+        var send2Button = document.getElementById('send2');
+        var message1Input = document.getElementById('message1');
+        var message2Input = document.getElementById('message2');
+        send1Button.addEventListener('click', send1, false);
+        send2Button.addEventListener('click', send2, false);
+
+        createConnection();
+
+        function send1() {
+            channels[0].send(message1Input.value);
+        }
+
+        function send2() {
+            channels[1].send(message2Input.value);
+        }
+
+        function onIceCandidate(event) {
+            if (event.candidate) {
+                sendMessage({type: 'candidate',
+                    label: event.candidate.sdpMLineIndex,
+                    id: event.candidate.sdpMid,
+                    candidate: event.candidate.candidate});
+            } else {
+                __log("End of candidates.");
+            }
+        }
+
+        if (webrtcDetectedBrowser === "firefox") {
+            getUserMedia(
+                    media,
+                    function (stream) {
+                        __log('Successful!');
+                        pcs[0].addStream(stream);
+                        call();
+                    },
+                    function () {
+                        alert('There has been a problem retrieving the streams - did you allow access?');
+                    }
+            );
+        }
+
+
+        function call() {
+
+            pcs[0].createOffer(function (sessionDescription) {
+                __log("Sending offer to peer.");
+                pcs[0].setLocalDescription(sessionDescription);
+                sendMessage(sessionDescription);
+            });
+        }
+
+
+        function createConnection() {
+
+            if (webrtcDetectedBrowser === "firefox") {
+                pcConstraints = null;
+            }
+            // Create an RTCPeerConnection via the polyfill (adapter.js).
+            pcs[0] = new RTCPeerConnection(servers, pcConstraints);
+            pcs[1] = new RTCPeerConnection(servers, pcConstraints);
+
+            pcs[0].onicecandidate = onIceCandidate;
+            pcs[1].onicecandidate = onIceCandidate;
+
+
+            if (webrtcDetectedBrowser === "firefox") {
+                pcs[0].onconnection = createChanel;
+            } else {
+                createChanel();
+                call();
+            }
+
+            pcs[1].ondatachannel = receiveChannelCallback;
+        }
+
+
+        function createChanel() {
+
+            try {
+                // Reliable Data Channels not yet supported in Chrome
+                // Data Channel api supported from Chrome M25.
+                // You need to start chrome with  --enable-data-channels flag.
+                if (webrtcDetectedBrowser === "firefox") {
+                    channels[0] = pcs[0].createDataChannel('RTCDataChannel', {});
+                } else {
+                    channels[0] = pcs[0].createDataChannel('RTCDataChannel', {reliable: false});
+                }
+                __log('Created send data channel');
+                channels[0].onmessage = function (event) {
+                    __log("Message in chanel #1: " + event.data);
+                };
+
+                channels[0].onopen = function () {
+                    __log('Chanel #1. state is: ' + channels[0].readyState);
+                };
+            } catch (e) {
+                alert('Failed to create data channel. ' +
+                        'You need Chrome M25 or later with --enable-data-channels flag');
+                __log('Create Data channel failed with exception: ' + e.message);
+            }
+        }
+
+
+        function receiveChannelCallback(event) {
+            __log('Receive Channel Callback');
+            if (webrtcDetectedBrowser === "firefox") {
+                channels[1] = event;
+            } else {
+                channels[1] = event.channel;
+            }
+
+            channels[1].onmessage = function (event) {
+                __log('Message in chanel #2: ' + event.data);
+            };
+            channels[1].onopen = function () {
+                __log('Chanel #2. state is: ' + channels[1].readyState);
+                channels[1].send('Hi!');
+            };
+        }
+
+
+        function sendMessage(sessionDescription) {
+
+            if (sessionDescription.type === 'offer') {
+                __log("Received offer from PC1.");
+
+                __log("\nSession Description type: " + sessionDescription.type);
+                //__log("Session Description:\n" + sessionDescription.sdp + "\n");
+
+                pcs[1].setRemoteDescription(new RTCSessionDescription(sessionDescription));
+
+                __log("Sending answer to PC1.");
+                pcs[1].createAnswer(function (sessionDescription) {
+                    pcs[1].setLocalDescription(sessionDescription);
+                    sendMessage(sessionDescription);
+                    if (webrtcDetectedBrowser == "firefox") {
+                        setTimeout(function () {
+                            pcs[1].connectDataConnection(port2, port1);
+                        }, 300);
+                    }
+                });
+
+
+            } else if (sessionDescription.type === 'answer') {
+                __log("Received answer from PC2.");
+
+                __log("\nSession Description type: " + sessionDescription.type);
+                //__log("Session Description:\n" + sessionDescription.sdp + "\n");
+
+                pcs[0].setRemoteDescription(sessionDescription, function () {
+                    if (webrtcDetectedBrowser == "firefox") {
+                        __log('-----------------------------------------------');
+                        pcs[0].connectDataConnection(port1, port2);
+                    }
+                });
+
+                __log('Connection is established');
+            } else if (sessionDescription.type === 'candidate') {
+                var candidate = new RTCIceCandidate({sdpMLineIndex: sessionDescription.label,
+                    candidate: sessionDescription.candidate});
+                pcs[0].addIceCandidate(candidate);
+                pcs[1].addIceCandidate(candidate);
+            }
+        }
+
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebRTC: RtpDataChannel. Demo #11: 2 Clients</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/jquery-1.9.1.min.js"></script>
+    <script src="/js/log.js"></script>
+    <script src="/js/adapter.js"></script>
+</head>
+<body>
+<h1>WebRTC: RtpDataChannel.</h1>
+
+<h2>Demo #11: 2 Clients</h2>
+<input type="button" id="call" value="Call"/>
+<br/>
+<input type="text" value="test" id="message"/>
+<input type="button" id="send" value="Send"/>
+<textarea style="width: 100%; height: 200px;" id="output"></textarea>
+<script>
+    function runDemo() {
+        // socket.io specific code
+        var socket = io.connect();
+
+        socket.on('connect', function () {
+            console.log('connect');
+        });
+
+        socket.on('signals', function (message) {
+            console.log('S->C: ' + JSON.stringify(message));
+            processSignalingMessage(message);
+        });
+
+        var mediaConstraints = null;
+
+        var callButton = document.getElementById('call');
+        var sendButton = document.getElementById('send');
+        var messageInput = document.getElementById('message');
+        sendButton.addEventListener('click', send, false);
+        callButton.addEventListener('click', call, false);
+
+        function send() {
+            channel.send(messageInput.value);
+        }
+
+        var media = {};
+        media.fake = media.audio = true;
+        var pc, channel = null;
+        var servers = null;
+        var pcConstraints = {optional: [
+            {RtpDataChannels: true}
+        ]};
+
+        var port1 = 5000;//Date.now();
+        var port2 = port1 + 1;
+
+
+        function onIceCandidate(event) {
+            if (event.candidate) {
+                sendMessage({type: 'candidate',
+                    label: event.candidate.sdpMLineIndex,
+                    id: event.candidate.sdpMid,
+                    candidate: event.candidate.candidate});
+            } else {
+                console.log("End of candidates.");
+            }
+        }
+
+        createConnection();
+
+        if (webrtcDetectedBrowser === "firefox") {
+            getUserMedia(
+                    media,
+                    function (stream) {
+                        console.log('Successful!');
+                        pc.addStream(stream);
+                    },
+                    function () {
+                        alert('There has been a problem retrieving the streams - did you allow access?');
+                    }
+            );
+        }
+
+        function createChanel() {
+
+            try {
+                if (!pc || typeof pc.createDataChannel == 'undefined') {
+                    console.log('RTCDataChannel is not enabled. Use Chrome Canary ' +
+                            'and enable this flag via chrome://flags');
+                    return;
+                }
+                if (webrtcDetectedBrowser === "firefox") {
+                    channel = pc.createDataChannel('RTCDataChannel', {});
+                } else {
+                    channel = pc.createDataChannel('RTCDataChannel', {reliable: false});
+                }
+                console.log('Created send data channel');
+
+                channel.onmessage = function (event) {
+                    console.log('Message in chanel #1: ' + event.data);
+                };
+                pc.ondatachannel = function () {
+                    console.log('peerConnection.ondatachannel event fired.');
+                };
+
+            } catch (e) {
+                alert('Failed to create data channel. ' +
+                        'You need Chrome M25 or later with --enable-data-channels flag');
+                console.log('Create Data channel failed with exception: ' + e.message);
+            }
+        }
+
+
+        function createConnection() {
+
+            if (webrtcDetectedBrowser === "firefox") {
+                pcConstraints = null;
+            }
+            // Create an RTCPeerConnection via the polyfill (adapter.js).
+            pc = new RTCPeerConnection(servers, pcConstraints);
+            pc.onicecandidate = onIceCandidate;
+
+            if (webrtcDetectedBrowser === "firefox") {
+                pc.onconnection = createChanel;
+            }
+
+            pc.ondatachannel = receiveChannelCallback;
+        }
+
+
+        function call() {
+
+            if (webrtcDetectedBrowser !== "firefox") {
+                createChanel();
+            }
+
+            pc.createOffer(function (sessionDescription) {
+                console.log("Sending offer to peer.");
+                pc.setLocalDescription(sessionDescription);
+                sendMessage(sessionDescription);
+            });
+        }
+
+        function receiveChannelCallback(event) {
+            console.log('Receive Channel Callback');
+            if (webrtcDetectedBrowser === "firefox") {
+                channel = event;
+            } else {
+                channel = event.channel;
+            }
+
+            channel.onmessage = function (event) {
+                console.log('Message in chanel #2: ' + event.data);
+            };
+            channel.onopen = function () {
+                console.log('Chanel #2. state is: ' + channel.readyState);
+                channel.send('Hi!');
+            };
+        }
+
+
+        function processSignalingMessage(sessionDescription) {
+
+            if (sessionDescription.type === 'offer') {
+                console.log("Received offer from pear.");
+                console.log("   Waiting...");
+                if (confirm(webrtcDetectedBrowser + ' calling!')) {
+
+                    pc.setRemoteDescription(new RTCSessionDescription(sessionDescription));
+
+                    console.log("Sending answer to PC1.");
+                    pc.createAnswer(function (sessionDescription) {
+
+                        pc.setLocalDescription(sessionDescription);
+                        sendMessage(sessionDescription);
+
+                        if (webrtcDetectedBrowser == "firefox") {
+                            setTimeout(function () {
+                                pc.connectDataConnection(port2, port1);
+                            }, 300);
+                        }
+                    });
+
+                } else {
+                    alert("Canceled...");
+                    console.log("Canceled...");
+                }
+
+            } else if (sessionDescription.type === 'answer') {
+                console.log("Received answer from pear.");
+
+                pc.setRemoteDescription(new RTCSessionDescription(sessionDescription), function () {
+                    if (webrtcDetectedBrowser === "firefox") {
+                        console.log('-----------------------------------------------');
+                        pc.connectDataConnection(port1, port2);
+                    }
+                });
+
+                console.log('Connection is established');
+            } else if (sessionDescription.type === 'candidate') {
+                var candidate = new RTCIceCandidate({sdpMLineIndex: sessionDescription.label,
+                    candidate: sessionDescription.candidate});
+                pc.addIceCandidate(candidate);
+            }
+        }
+
+        function sendMessage(message) {
+            console.log('C->S: ' + JSON.stringify(message));
+            socket.emit('signals', message);
+        }
+    }
+</script>
+</body>
+</html>

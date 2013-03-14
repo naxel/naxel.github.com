@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebRTC: RTCPeerConnection. Demo #8: Ice Server and Candidates</title>
+    <script src="../../js/jquery-1.9.1.min.js"></script>
+    <script src="../../js/log.js"></script>
+    <script src="../../js/adapter.js"></script>
+</head>
+<body>
+<h1>WebRTC: RTCPeerConnection.</h1>
+
+<h2>Demo #8: Ice Server and Candidates</h2>
+
+<video id="local"></video>
+<video id="remote"></video>
+<input type="button" id="call" value="Call"/>
+<textarea style="width: 100%; height: 200px;" id="output"></textarea>
+<script>
+    function runDemo() {
+        var callButton = document.getElementById('call');
+        var localStream, remoteStream;
+        var videoLocal = document.getElementById('local');
+        var videoRemote = document.getElementById('remote');
+        callButton.addEventListener('click', call, false);
+
+        getUserMedia({
+            video: true,
+            audio: true
+        }, onSuccess, function () {
+            alert('There has been a problem retrieving the streams - did you allow access?');
+        });
+
+        function onSuccess(stream) {
+            __log('Successful!');
+
+            videoLocal.autoplay = true;
+            attachMediaStream(videoLocal, stream);
+            //code
+            localStream = stream;
+
+            __log("Adding local stream.");
+            pc1.addStream(localStream);
+        }
+
+        var mediaConstraints = {
+            'mandatory': {
+                'OfferToReceiveAudio': true,
+                'OfferToReceiveVideo': true
+            }
+        };
+
+        var configuration = { "iceServers": [
+            { "url": "stun:23.21.150.121" }
+        ] };
+        var pc1 = new RTCPeerConnection(configuration);
+        var pc2 = new RTCPeerConnection(configuration);
+
+        pc1.onicecandidate = onIceCandidate;
+        pc2.onicecandidate = onIceCandidate;
+
+        function onIceCandidate(event) {
+            if (event.candidate) {
+                sendMessage({type: 'candidate',
+                    label: event.candidate.sdpMLineIndex,
+                    id: event.candidate.sdpMid,
+                    candidate: event.candidate.candidate});
+            } else {
+                __log("End of candidates.");
+            }
+        }
+
+        function call() {
+
+            pc1.createOffer(function (sessionDescription) {
+                __log("Sending offer to peer.");
+                pc1.setLocalDescription(sessionDescription);
+                sendMessage(sessionDescription);
+            }, null, mediaConstraints);
+        }
+
+        function sendMessage(sessionDescription) {
+
+            __log("\nSession Description type: " + sessionDescription.type);
+            __log("Session Description:\n" + sessionDescription.sdp + "\n");
+
+            if (sessionDescription.type === 'offer') {
+                __log("Received offer from PC1.");
+                __log("   Waiting...");
+                if (confirm(webrtcDetectedBrowser + ' calling!')) {
+
+                    pc2.setRemoteDescription(new RTCSessionDescription(sessionDescription));
+
+                    __log("Sending answer to PC1.");
+                    pc2.createAnswer(function (sessionDescription) {
+
+                        pc2.setLocalDescription(sessionDescription);
+                        sendMessage(sessionDescription);
+
+                    }, null, mediaConstraints);
+
+                } else {
+                    alert("Canceled...");
+                    __log("Canceled...");
+                }
+
+            } else if (sessionDescription.type === 'answer') {
+                __log("Received answer from PC2.");
+                pc1.setRemoteDescription(new RTCSessionDescription(sessionDescription));
+                __log('Connection is established');
+            } else if (sessionDescription.type === 'candidate') {
+                var candidate = new RTCIceCandidate({sdpMLineIndex: sessionDescription.label,
+                    candidate: sessionDescription.candidate});
+                pc1.addIceCandidate(candidate);
+                pc2.addIceCandidate(candidate);
+            }
+        }
+
+        pc2.onaddstream = onRemoteStreamAdded;
+
+        function onRemoteStreamAdded(event) {
+            __log("Remote stream added.");
+            videoRemote.autoplay = true;
+            attachMediaStream(videoRemote, event.stream);
+            remoteStream = event.stream;
+        }
+    }
+</script>
+</body>
+</html>

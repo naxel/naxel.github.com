@@ -1,0 +1,735 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>WebRTC: Real-time communication between browsers</title>
+
+		<meta name="description" content="WebRTC: Real-time communication between browsers">
+		<meta name="author" content="Alexander Khaylo">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="css/reveal.min.css">
+		<link rel="stylesheet" href="css/theme/default.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', use the PDF print sheet -->
+		<script>
+			document.write( '<link rel="stylesheet" href="css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+        <style>
+            .reveal p.notification-message {
+                background: rgb(252, 252, 178);
+                border: rgb(255, 65, 29) 1px dashed;
+                border-radius: 5px;
+                margin: 20px 0;
+                color: rgb(0, 0, 0);
+                padding: 5px;
+            }
+        </style>
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+
+            <section>
+                <h1>WebRTC</h1>
+
+                <h3>Real-time communication between browsers</h3>
+
+                <p>
+                    <img src="images/webrtc.png">
+                </p>
+
+                <p>
+                    <small>Alexander Khaylo aka <a href="http://twitter.com/naxel_">naxel</a></small>
+                </p>
+
+            </section>
+            <section>
+                <section>
+                    <h1>WebRTC, WTF?</h1>
+                    <a href="#" class="image navigate-down">
+                        <img src="images/tort.jpg" alt="Tort">
+                    </a>
+                </section>
+                <section>
+                    <p>
+                        WebRTC нужен для:
+                    </p>
+                    <ul>
+                        <li class="fragment">
+                            Получение доступа к камере и
+                            микрофону
+                        </li>
+
+                        <li class="fragment">Аудио и видео звонки</li>
+
+                        <li class="fragment">Передача текстовой информации</li>
+                    </ul>
+
+                </section>
+            </section>
+
+            <section>
+                <h2>Call me!</h2>
+
+                <p>
+                    <img src="images/tv.jpg">
+                </p>
+                <p class="fragment">
+                    Tвой кактус у нас...
+                </p>
+
+            </section>
+
+            <section>
+                <h2>MediaStream and getUserMedia </h2>
+                <p>
+                    Поддержка:
+                </p>
+                <ul>
+                    <li>
+                        Chrome 18.0.1008+
+                    </li>
+
+                    <li>Opera, Opera Mobile 12</li>
+
+                    <li>Firefox 17+ (включается в about:config)</li>
+                </ul>
+                <p>
+                    <img src="images/media.peerconnection.enabled.png">
+                </p>
+
+                <p class="notification-message">
+                    При локальном запуске со схемой «file:///»,
+                    браузер из соображений безопасности будет блокировать этот функционал.
+                </p>
+
+            </section>
+
+
+            <section>
+                <section>
+                    <h2>GetUserMedia</h2>
+
+                    <p>
+                        Для получения медиа потока необходимо:
+                    </p>
+                    <ul>
+                        <li class="fragment">
+                            Проверить поддержку браузером
+                        </li>
+
+                        <li class="fragment">Указать потоки которые хотите получить (видео и/или аудио)</li>
+
+                        <li class="fragment">Указать два калбека</li>
+                    </ul>
+                    <p>
+                        <a href="#" class="navigate-down">∇</a>
+                    </p>
+                </section>
+
+                <section>
+                    <pre><code contenteditable>getUserMedia({
+    video: true,
+    audio: true
+}, onSuccess, onError);
+
+function onSuccess() {
+    alert('Successful!');
+}
+
+function onError() {
+     alert('Error! Did you allow access?');
+}</code></pre>
+                    <p>
+                        <a href="demos/demo1/" target="_blank">Demo #1</a>
+                    </p>
+                </section>
+            </section>
+
+
+            <section>
+                <section>
+                    <h2>Стандарты?</h2>
+                    <a href="#" class="image navigate-down">
+                        <img src="images/browsers.png" alt="Browsers">
+                    </a>
+                </section>
+                <section>
+                    <h2>Стандарты? Аха!</h2>
+
+                    <pre><code contenteditable>
+navigator.getUserMedia ||
+    (navigator.getUserMedia = navigator.mozGetUserMedia ||
+    navigator.webkitGetUserMedia || navigator.msGetUserMedia);
+
+if (navigator.getUserMedia) {
+    //code...
+} else {
+    alert('getUserMedia is not supported in this browser.');
+}
+               	        </code></pre>
+                </section>
+            </section>
+
+
+            <section>
+                <h2>Hacks</h2>
+                <img src="images/hacks.gif" alt="Hacks">
+
+                <p>
+                    <a href="js/adapter.js" target="_blank">adapter.js</a>
+                </p>
+            </section>
+
+
+            <section>
+                <h2>Дополнительные параметры</h2>
+
+                <p>
+                    Можно указать размеры сторон и их соотношение для видео потока
+                </p>
+
+                <pre><code contenteditable>
+navigator.getUserMedia({
+    video: {
+        mandatory: {
+        maxWidth: 360
+        }
+    }
+}
+           	        </code></pre>
+                <p>
+                    Пока поддерживает только Chrome
+                </p>
+            </section>
+
+            <section>
+                <section>
+                    <h2>Video streams</h2>
+                    <a href="#" class="image navigate-down">
+                         <img src="images/flow.jpg" alt="Browsers">
+                     </a>
+                </section>
+                <section>
+                    <p>Чтобы отобразить видео поток нужно:</p>
+                    <ol>
+                        <li class="fragment">Создать элемент video на странице</li>
+                        <li class="fragment">Получить эго из DOM</li>
+                        <li class="fragment">Установить ему autoplay</li>
+                        <li class="fragment">Установить ему в SRC видео поток</li>
+                    </ol>
+                    <p> </p>
+                    <p>
+                        <a href="#" class="navigate-down">∇</a>
+                    </p>
+                </section>
+                <section>
+                    <pre><code>
+&lt;video id="webCam"&gt;&lt;/video&gt;
+                    </code></pre>
+                    <pre><code contenteditable>
+var video = document.getElementById('webCam');
+video.autoplay = true;
+video.src = URL.createObjectURL(stream);
+               	    </code></pre>
+                    <p>
+                        <a href="demos/demo2/" target="_blank">Demo #2</a>
+                    </p>
+                </section>
+            </section>
+
+
+            <section>
+                <section>
+                    <h2>Capturing images</h2>
+                    <p>Для отображения кадра на канве:</p>
+                    <ol>
+                        <li class="fragment">Получить элемент канвы из DOM</li>
+                        <li class="fragment">Получить его контекст</li>
+                        <li class="fragment">Сделать канву таких же размеров как и видео</li>
+                        <li class="fragment">Нарисовать!</li>
+                    </ol>
+                    <p> </p>
+                    <p>
+                        <a href="#" class="navigate-down">∇</a>
+                    </p>
+                </section>
+                <section>
+                    <pre><code>
+&lt;canvas id="photo"&gt;&lt;/canvas&gt;
+
+&lt;input type="button" id="takePhoto" value="Cheese!" /&gt;
+                    </code></pre>
+                    <pre><code contenteditable>
+function takePhoto() {
+    var photo = document.getElementById('photo'),
+        context = photo.getContext('2d');
+
+    photo.width = video.clientWidth;
+    photo.height = video.clientHeight;
+
+    context.drawImage(video, 0, 0, photo.width, photo.height);
+}
+               	    </code></pre>
+                    <p>
+                        <a href="demos/demo3/" target="_blank">Demo #3</a>
+                    </p>
+                </section>
+            </section>
+
+            <section>
+                <h2>Canvas stream</h2>
+                <pre><code>
+&lt;canvas id="hCanvas" style="display: none;"&gt;&lt;/canvas&gt;
+                </code></pre>
+                <pre><code contenteditable>
+var hCanvas = document.getElementById('hCanvas'),
+var hCtx = hCanvas.getContext('2d'),
+
+function streamFeed() {
+    requestAnimationFrame(streamFeed);
+    hCtx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    var imageData = hCtx.getImageData(0, 0, canvas.width, canvas.height);
+    context.putImageData(imageData, 0, 0);
+}
+           	    </code></pre>
+                <p>
+                    <a href="demos/demo4/" target="_blank">Demo #4</a>
+                </p>
+            </section>
+
+
+            <section>
+                <h2>Video streams + effects</h2>
+                <pre><code contenteditable>
+function streamFeed() {
+    //…
+    imageData.data = addEffect(imageData.data);
+    context.putImageData(imageData, 0, 0);
+}
+
+function addEffect (data) {
+    for (var i = 0, l = data.length; i < l; i += 4) {
+        data[i] = 255 - data[i]; // red
+        data[i + 1] = 255 - data[i + 1]; // green
+        data[i + 2] = 255 - data[i + 2]; // blue
+    }
+    return data;
+}
+           	    </code></pre>
+                <p>
+                    <a href="demos/demo5/" target="_blank">Demo #5</a>
+                </p>
+            </section>
+
+            <section>
+                <section>
+                    <h2>RTCPeerConnection</h2>
+                    <a href="#" class="image navigate-down">
+                        <img src="images/peer2peer.jpg" alt="P2P">
+                    </a>
+                </section>
+                <section>
+                    <h2>Architecture</h2>
+                    <a href="#" class="image navigate-down">
+                        <img src="images/jsep_architecture.jpg" alt="Architecture">
+                    </a>
+                </section>
+                <section>
+                    <p>Сигнализационные сообщения:</p>
+                    <ul>
+                        <li>Сессионные сообщения</li>
+                        <li>Конфигурация сети</li>
+                        <li>Медиа-возможности</li>
+                    </ul>
+
+                    <p class="notification-message">
+                        Обмен этой информации должен быть завершен до начала передачи медиа потоков.
+               		</p>
+                    <aside class="notes">
+                        <ul>
+                            <li>Сессионные сообщения: инициализации или закрытии связи и сообщения об ошибках</li>
+                            <li>Конфигурация сети: информация о IP-адрессе и порте  компьютера</li>
+                            <li>Медиа-возможности: поддерживаемые кодеки браузером и другое</li>
+                        </ul>
+                    </aside>
+                </section>
+            </section>
+
+            <section>
+
+                <section>
+                    <h2>Offer and Answer</h2>
+                    <a href="#" class="image navigate-down">
+                        <img src="images/alloallo.jpg" alt="Allo!">
+                    </a>
+                </section>
+                <section>
+                    <p>
+                        Создаем соединение:
+                    </p>
+                    <pre><code contenteditable>
+var pc1 = new RTCPeerConnection(null);
+
+pc1.onconnecting = onSessionConnecting;
+pc1.onaddstream = onRemoteStreamAdded;
+               	    </code></pre>
+                    <p>
+                        <a href="#" class="navigate-down">∇</a>
+                    </p>
+                </section>
+                <section>
+                    <p>
+                        Запрашиваем подключение:
+                    </p>
+                    <pre><code contenteditable>
+var mediaConstraints = {
+    'mandatory': {
+        'OfferToReceiveAudio': true,
+        'OfferToReceiveVideo': true
+    }
+};
+
+pc1.createOffer(function (sessionDescription) {
+    pc1.setLocalDescription(sessionDescription);
+    sendMessage(sessionDescription);
+}, null, mediaConstraints);
+               	    </code></pre>
+                    <p>
+                        <a href="#" class="navigate-down">∇</a>
+                    </p>
+                </section>
+
+                <section>
+                    <p>
+                        Разрешаем установить связь и отсылаем ответ:
+                    </p>
+                    <pre><code contenteditable>
+if (sessionDescription.type === 'offer') {
+    pc2.createAnswer(function (sessionDescription) {
+        pc2.setLocalDescription(sessionDescription);
+        sendMessage(sessionDescription);
+    }, null, mediaConstraints);
+}
+               	    </code></pre>
+                    <p>
+                        <a href="#" class="navigate-down">∇</a>
+                    </p>
+                </section>
+
+                <section>
+                    <p>
+                        Получаем ответ от клиента, к которому хотим подключиться:
+                    </p>
+                    <pre><code contenteditable>
+if (sessionDescription.type === 'answer') {
+    pc1.setRemoteDescription(
+        new RTCSessionDescription(sessionDescription)
+    );
+    alert('Connection is established');
+}
+               	    </code></pre>
+                    <p>
+                        <a href="demos/demo6/" target="_blank">Demo #6</a>
+                    </p>
+                </section>
+            </section>
+
+            <section>
+                <section>
+                    <h2>Add Stream</h2>
+                    <p>
+                        Добавляем поток в RTCPeerConnection:
+                    </p>
+                    <pre><code contenteditable>
+function onSuccess(stream) {
+    videoLocal.autoplay = true;
+    attachMediaStream(videoLocal, stream);
+
+    pc1.addStream(stream);
+}
+               	    </code></pre>
+                    <p class="notification-message">
+                        Поток нужно добавить до установки соединения.
+               		</p>
+                    <p>
+                        <a href="#" class="navigate-down">∇</a>
+                    </p>
+                </section>
+                <section>
+                    <p>
+                        Получаем входящий поток и добавляем его к видео:
+                    </p>
+                    <pre><code contenteditable>
+pc2.onaddstream = function (event) {
+    videoRemote.autoplay = true;
+    attachMediaStream(videoRemote, event.stream);
+}
+               	    </code></pre>
+                    <p>
+                        <a href="demos/demo8/" target="_blank">Demo #8</a>
+                    </p>
+                </section>
+            </section>
+
+            <section>
+                <section>
+                    <h2>Ice Servers (stun & turn)</h2>
+                    <a href="#" class="image navigate-down">
+                        <img src="images/stun.png" alt="Allo!">
+                    </a>
+                </section>
+
+                <section>
+                    <p>
+                        Добавляем stun-сервер:
+                    </p>
+                    <pre><code contenteditable>
+var configuration = { "iceServers": [
+    { "url": "stun:23.21.150.121" }
+] };
+var pc1 = new RTCPeerConnection(configuration);
+               	    </code></pre>
+                    <p>
+                        <a href="#" class="navigate-down">∇</a>
+                    </p>
+                </section>
+
+                <section>
+                    <pre><code contenteditable>
+pc.onicecandidate = function (event) {
+    if (event.candidate) {
+        sendMessage({type: 'candidate',
+            label: event.candidate.sdpMLineIndex,
+            id: event.candidate.sdpMid,
+            candidate: event.candidate.candidate});
+    }
+}
+               	    </code></pre>
+                    <p>
+                        <a href="#" class="navigate-down">∇</a>
+                    </p>
+                </section>
+                <section>
+                    <p>
+                        Добавляем кандидаты:
+                    </p>
+                    <pre><code contenteditable>
+if (sessionDescription.type === 'candidate') {
+    var candidate = new RTCIceCandidate({sdpMLineIndex: sessionDescription.label,
+        candidate: sessionDescription.candidate});
+    pc1.addIceCandidate(candidate);
+}
+               	    </code></pre>
+                    <p>
+                        <a href="#" class="navigate-down">∇</a>
+                    </p>
+                </section>
+                <section>
+                    <a href="#" class="image navigate-next">
+                        <img src="images/wdataPathways.jpg" alt="Data transfer">
+                    </a>
+                </section>
+            </section>
+
+            <section>
+                <p>RTCPeerConnection работает в:</p>
+                <ul>
+                    <li>Chrome</li>
+                    <li>Firefox  (с включенными getUserMedia в about:config)</li>
+                </ul>
+                <p>
+                    <a href="demos/demo8/" target="_blank">Demo #8</a>
+                </p>
+            </section>
+
+
+<section>
+            <section>
+                <h2>Data Channels</h2>
+                <a href="#" class="image navigate-next">
+                    <img src="images/text-message.jpg" alt="Data Channels">
+                </a>
+            </section>
+            <section>
+            <pre><code contenteditable>
+var pcConstraints = {optional: [
+       {RtpDataChannels: true}
+   ]};
+pc = new RTCPeerConnection(servers, pcConstraints);
+pc.ondatachannel = receiveChannelCallback;  //next*2 page ->
+            </code></pre>
+                <p>
+                    <a href="#" class="navigate-down">∇</a>
+                </p>
+            </section>
+
+            <section>
+            <pre><code contenteditable>
+channel = pc.createDataChannel('RTCDataChannel', {reliable: false});
+
+channel.onmessage = function (event) {
+    console.log("Message in chanel #1: " + event.data);
+};
+channel.onopen = function () {
+    console.log('Chanel #1. state is: ' + channel.readyState);
+};
+</code></pre>
+                <p>
+                    <a href="#" class="navigate-down">∇</a>
+                </p>
+            </section>
+
+            <section>
+                <pre><code contenteditable>
+function receiveChannelCallback(event) {
+    channel = event.channel;
+    channel.onmessage = function (event) {
+        console.log('Message in chanel #2: ' + event.data);
+    };
+
+    channel.onopen = function () {
+        channel.send('Hi!');
+    };
+}
+            </code></pre>
+                <p>
+                    <a href="demos/demo10/" target="_blank">Demo #10</a>
+                </p>
+            </section>
+</section>
+
+            <section>
+                <section>
+                    <p>RtpDataChannels работает в:</p>
+                    <ul>
+                        <li>Chrome (при запуске с флагом --enable-data-channels)</li>
+                        <li>Firefox (с включенными getUserMedia в about:config)</li>
+                    </ul>
+                    <a href="#" class="image navigate-next">
+                        <img src="images/enable-data-channels.png" alt="enable-data-channels">
+                    </a>
+                </section>
+                <section>
+                    <a href="#" class="image navigate-next">
+                        <img src="images/problems.gif" alt="Problems">
+                    </a>
+                </section>
+            </section>
+
+            <section>
+                <h2>Дополнение №1</h2>
+                <pre><code contenteditable>var express = require('express')
+    , sio = require('socket.io');
+var app = express.createServer();
+
+app.get('/', function(req, res) {
+    res.sendfile(__dirname + '/demos.html');
+});
+
+app.listen(3001);
+var io = sio.listen(app);
+
+io.sockets.on('connection', function(socket) {
+
+    socket.on('signals', function(data) {
+        socket.broadcast.emit('signals', data);
+    });
+});</code></pre>
+            </section>
+
+            <section>
+                <h2>Почитать</h2>
+
+                <ul>
+                    <li><a href="http://www.webrtc.org/" target="_blank">WebRTC.org</a></li>
+                    <li><a href="http://www.w3.org/TR/webrtc/" target="_blank">WebRTC 1.0</a></li>
+                    <li><a href="http://www.netmagazine.com/tutorials/get-started-webrtc" target="_blank">Get started with WebRTC</a></li>
+                    <li><a href="http://updates.html5rocks.com/2012/12/Screensharing-with-WebRTC" target="_blank">Screensharing with WebRTC</a></li>
+                    <li><a href="http://blog.chromium.org/2013/02/hello-firefox-this-is-chrome-calling.html" target="_blank">Hello Firefox, this is Chrome calling!</a></li>
+                    <li><a href="https://hacks.mozilla.org/2012/11/progress-update-on-webrtc-for-firefox-on-desktop/" target="_blank">Enabling WebRTC in Firefox</a></li>
+                    <li><a href="http://caniuse.com/stream" target="_blank">Can I use getUserMedia/Stream API?</a></li>
+                    <li><a href="https://developer.mozilla.org/en-US/docs/DOM/window.URL.createObjectURL" target="_blank">Support window.URL.createObjectURL </a></li>
+                    <li><a href="https://hacks.mozilla.org/2013/02/responsive-web-typography-with-webrtc/" target="_blank">Responsive Web Typography with WebRTC</a></li>
+                    <li><a href="https://hacks.mozilla.org/2013/02/cross-browser-camera-capture-with-getusermediawebrtc/" target="_blank">Cross-browser camera capture</a></li>
+                    <li><a href="http://www.html5rocks.com/en/tutorials/webrtc/basics/" target="_blank">WebRTC: Quick start</a></li>
+                </ul>
+            </section>
+            <section>
+                <h2>Посмотреть</h2>
+
+                <ul>
+                    <li><a href="http://www.soundstep.com/blog/experiments/jsdetection/" target="_blank">Xylophone with motion detection </a></li>
+                    <li><a href="http://neave.github.com/face-detection/" target="_blank">Face detection</a></li>
+                    <li><a href="http://webdesign.maratz.com/lab/responsivetypography/simple/" target="_blank">Responsive Web Typography with WebRTC</a></li>
+                    <li><a href="http://mozilla.github.com/webrtc-landing/" target="_blank">Demos for Firefox</a></li>
+                </ul>
+            </section>
+
+
+            <section>
+                <p>Вопросы?</p>
+                <img src="images/trollface.jpeg" alt="Questions?" />
+            </section>
+
+            <section>
+                <h2>Спасибо!</h2>
+                <img src="images/heah.gif" alt="Thank you!" />
+            </section>
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+                minScale: 0.5,
+                maxScale: 1.0,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/showdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+					// { src: 'plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>

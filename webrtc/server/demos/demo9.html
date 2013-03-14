@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebRTC: RTCPeerConnection. Demo #9: 2 Clients</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/jquery-1.9.1.min.js"></script>
+    <script src="/js/log.js"></script>
+    <script src="/js/adapter.js"></script>
+</head>
+<body>
+<h1>WebRTC: RTCPeerConnection.</h1>
+
+<h2>Demo #9: 2 Clients</h2>
+
+<video id="local"></video>
+<video id="remote"></video>
+<input type="button" id="call" value="Call"/>
+<textarea style="width: 100%; height: 200px;" id="output"></textarea>
+
+<script>
+    function runDemo() {
+        // socket.io specific code
+        var socket = io.connect();
+
+        socket.on('connect', function () {
+            console.log('connect');
+        });
+
+        socket.on('signals', function (message) {
+            console.log('S->C: ' + JSON.stringify(message));
+            processSignalingMessage(message);
+        });
+
+        var callButton = document.getElementById('call');
+        var localStream, remoteStream;
+        var videoLocal = document.getElementById('local');
+        var videoRemote = document.getElementById('remote');
+        callButton.addEventListener('click', call, false);
+
+        getUserMedia({
+            audio: true,
+            video: true
+        }, onSuccess, function () {
+            alert('There has been a problem retrieving the streams - did you allow access?');
+        });
+
+        function onSuccess(stream) {
+            console.log('Successful!');
+
+            videoLocal.autoplay = true;
+            attachMediaStream(videoLocal, stream);
+            //code
+            localStream = stream;
+
+            console.log("Adding local stream.");
+            pc.addStream(localStream);
+        }
+
+        var mediaConstraints = {
+            'mandatory': {
+                'OfferToReceiveAudio': true,
+                'OfferToReceiveVideo': true,
+                'MozDontOfferDataChannel': true
+            }
+        };
+
+
+        var pcConfig = {"iceServers": [
+            {"url": "stun:stun.l.google.com:19302"}
+        ]};
+        var pcConstraints = {"optional": [
+            {
+                "DtlsSrtpKeyAgreement": true
+            }
+        ]};
+        // Force the use of a number IP STUN server for Firefox.
+        if (webrtcDetectedBrowser == "firefox") {
+            pcConfig = {"iceServers": [
+                {"url": "stun:23.21.150.121"}
+            ]};
+        }
+
+        // Create an RTCPeerConnection via the polyfill (adapter.js).
+        var pc = new RTCPeerConnection(pcConfig, pcConstraints);
+
+        pc.onicecandidate = onIceCandidate;
+
+        function onIceCandidate(event) {
+            if (event.candidate) {
+                sendMessage({type: 'candidate',
+                    label: event.candidate.sdpMLineIndex,
+                    id: event.candidate.sdpMid,
+                    candidate: event.candidate.candidate});
+            } else {
+                console.log("End of candidates.");
+            }
+        }
+
+        function call() {
+
+            var constraints = {"optional": [], "mandatory": {"MozDontOfferDataChannel": true}};
+            // temporary measure to remove Moz* constraints in Chrome
+            if (webrtcDetectedBrowser === "chrome") {
+                for (prop in constraints.mandatory) {
+                    if (prop.indexOf("Moz") != -1) {
+                        delete constraints.mandatory[prop];
+                    }
+                }
+            }
+            constraints = mergeConstraints(constraints, mediaConstraints);
+            console.log("Sending offer to peer, with constraints: \n" +
+                    " \"" + JSON.stringify(constraints) + "\".");
+
+            pc.createOffer(function (sessionDescription) {
+                console.log("Sending offer to peer.");
+                pc.setLocalDescription(sessionDescription);
+                sendMessage(sessionDescription);
+            }, null, constraints);
+        }
+
+        function processSignalingMessage(sessionDescription) {
+
+            if (sessionDescription.type === 'offer') {
+                console.log("Received offer from pear.");
+                console.log("   Waiting...");
+                if (confirm(webrtcDetectedBrowser + ' calling!')) {
+
+                    pc.setRemoteDescription(new RTCSessionDescription(sessionDescription));
+
+                    console.log("Sending answer to PC1.");
+                    pc.createAnswer(function (sessionDescription) {
+
+                        pc.setLocalDescription(sessionDescription);
+                        sendMessage(sessionDescription);
+
+                    }, null, mediaConstraints);
+
+                } else {
+                    alert("Canceled...");
+                    console.log("Canceled...");
+                }
+
+            } else if (sessionDescription.type === 'answer') {
+                console.log("Received answer from pear.");
+                pc.setRemoteDescription(new RTCSessionDescription(sessionDescription));
+                console.log('Connection is established');
+            } else if (sessionDescription.type === 'candidate') {
+                var candidate = new RTCIceCandidate({sdpMLineIndex: sessionDescription.label,
+                    candidate: sessionDescription.candidate});
+                pc.addIceCandidate(candidate);
+            }
+        }
+
+        pc.onaddstream = onRemoteStreamAdded;
+
+        function onRemoteStreamAdded(event) {
+            console.log("Remote stream added.");
+            videoRemote.autoplay = true;
+            attachMediaStream(videoRemote, event.stream);
+            remoteStream = event.stream;
+        }
+
+        function sendMessage(message) {
+            console.log('C->S: ' + JSON.stringify(message));
+            socket.emit('signals', message);
+        }
+
+        function mergeConstraints(cons1, cons2) {
+            var merged = cons1;
+            for (var name in cons2.mandatory) {
+                merged.mandatory[name] = cons2.mandatory[name];
+            }
+            merged.optional.concat(cons2.optional);
+            return merged;
+        }
+    }
+</script>
+</body>
+</html>

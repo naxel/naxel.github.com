@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>WebRTC: MediaStream. Demo #5: Video streams + Canvas Effects</title>
+    <script src="../../js/jquery-1.9.1.min.js"></script>
+    <script src="../../js/log.js"></script>
+    <script src="../../js/adapter.js"></script>
+</head>
+<body>
+<h1>WebRTC: MediaStream.</h1>
+
+<h2>Demo #5: Video streams + Canvas Effects</h2>
+<select id="effects" name="effects">
+    <option selected value="effect1">Effect #1</option>
+    <option value="effect2">Effect #2</option>
+    <option value="effect3">Effect #3</option>
+    <option value="effect4">Effect #4</option>
+</select>
+<video id="webCam"></video>
+<canvas id="canvas"></canvas>
+<canvas id="hiddenCanvas" style="display: none;"></canvas>
+<textarea style="width: 100%; height: 200px;" id="output"></textarea>
+<script>
+    function runDemo() {
+        var video = document.getElementById('webCam'),
+                canvas = document.getElementById('canvas'),
+                context = canvas.getContext('2d'),
+                hiddenCanvas = document.getElementById('hiddenCanvas'),
+                hiddenContext = hiddenCanvas.getContext('2d'),
+                effects = document.getElementById('effects');
+
+        var effect = 'effect1';
+
+        canvas.addEventListener('click', openPhoto, false);
+
+        effects.addEventListener('change', function () {
+            effect = effects.value;
+        }, false);
+
+
+        getUserMedia({
+            video: true
+        }, onSuccess, onError);
+
+        function onSuccess(stream) {
+            __log('Successful!');
+            video.autoplay = true;
+            attachMediaStream(video, stream);
+
+            //code
+            canvas.width = hiddenCanvas.width = 640;
+            canvas.height = hiddenCanvas.height = 480;
+            streamFeed();
+
+        }
+
+        function onError() {
+            alert('There has been a problem retrieving the streams - did you allow access?');
+        }
+
+
+        function streamFeed() {
+            requestAnimationFrame(streamFeed);
+            hiddenContext.drawImage(video, 0, 0, canvas.width, canvas.height);
+            var imageData = hiddenContext.getImageData(0, 0, canvas.width, canvas.height);
+            imageData.data = addEffect(imageData.data);
+
+            context.putImageData(imageData, 0, 0);
+        }
+
+
+        function addEffect(data) {
+            switch (effect) {
+                case 'effect1':
+                    data = addEffect1(data);
+                    break;
+                case 'effect2':
+                    data = addEffect2(data);
+                    break;
+                case 'effect3':
+                    data = addEffect3(data);
+                    break;
+                case 'effect4':
+                    data = addEffect4(data);
+                    break;
+            }
+            return data;
+        }
+
+        function addEffect1(data) {
+            for (var i = 0, l = data.length; i < l; i += 4) {
+                data[i + 1] = 0; // g
+                data[i + 2] = 0; // b
+            }
+            return data;
+        }
+
+        function addEffect2(data) {
+            for (var i = 0, l = data.length; i < l; i += 4) {
+                data[i] = data[i]; // red
+                data[i + 1] = data[i + 1]; // green
+                data[i + 2] = 0; // blue
+                // i+3 is alpha (the fourth element)
+            }
+            return data;
+        }
+
+
+        function addEffect3(data) {
+            for (var i = 0, l = data.length; i < l; i += 4) {
+                data[i] = 255 - data[i]; // red
+                data[i + 1] = 255 - data[i + 1]; // green
+                data[i + 2] = 255 - data[i + 2]; // blue
+            }
+            return data;
+        }
+
+        function addEffect4(data) {
+            for (var i = 0, l = data.length; i < l; i += 4) {
+                var grayscale = data[i] * .3 + data[i + 1] * .59 + data[i + 2] * .11;
+                data[i] = grayscale;   // red
+                data[i + 1] = grayscale;   // green
+                data[i + 2] = grayscale;   // blue
+                // alpha
+            }
+            return data;
+        }
+
+
+        window.requestAnimationFrame ||
+        (window.requestAnimationFrame = window.webkitRequestAnimationFrame ||
+                window.mozRequestAnimationFrame ||
+                window.oRequestAnimationFrame ||
+                window.msRequestAnimationFrame ||
+                function (callback) {
+                    window.setTimeout(callback, 1000 / 60);
+                });
+
+
+        function openPhoto() {
+            window.open(
+                    canvas.toDataURL("image/png"),
+                    '_blank' // <- This is what makes it open in a new window.
+            );
+        }
+    }
+</script>
+</body>
+</html>
