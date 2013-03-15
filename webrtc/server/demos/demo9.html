@@ -26,9 +26,12 @@
             console.log('connect');
         });
 
-        socket.on('signals', function (message) {
-            console.log('S->C: ' + JSON.stringify(message));
-            processSignalingMessage(message);
+        socket.on('signals', function (data) {
+            if (data.path == path) {
+                console.log('S->C: ' + JSON.stringify(data.message));
+                processSignalingMessage(data.message);
+            }
+
         });
 
         var callButton = document.getElementById('call');
@@ -36,6 +39,7 @@
         var videoLocal = document.getElementById('local');
         var videoRemote = document.getElementById('remote');
         callButton.addEventListener('click', call, false);
+        var path = location.hash;
 
         getUserMedia({
             audio: true,
@@ -109,7 +113,7 @@
             }
             constraints = mergeConstraints(constraints, mediaConstraints);
             console.log("Sending offer to peer, with constraints: \n" +
-                    " \"" + JSON.stringify(constraints) + "\".");
+                " \"" + JSON.stringify(constraints) + "\".");
 
             pc.createOffer(function (sessionDescription) {
                 console.log("Sending offer to peer.");
@@ -162,7 +166,7 @@
 
         function sendMessage(message) {
             console.log('C->S: ' + JSON.stringify(message));
-            socket.emit('signals', message);
+            socket.emit('signals', {message: message, path: path});
         }
 
         function mergeConstraints(cons1, cons2) {
