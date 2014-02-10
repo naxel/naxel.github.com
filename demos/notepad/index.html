@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Title</title>
+    <link href="css/style.css" rel="stylesheet" media="all">
+</head>
+<body>
+<div id="notepad">
+    <div id="header">
+        <div id="iconBlock">
+            <img id="icon" src="img/icon.png" alt=""/>
+        </div>
+
+
+        <div id="title">
+            <span id="name">Безымянный ― Блокнот</span>
+        </div>
+        <div id="close">x</div>
+
+        <div id="max">□</div>
+        <div id="min">_</div>
+    </div>
+    <div id="menu">
+        <ul>
+            <li id="openFile">Файл</li>
+            <li>Правка</li>
+            <li>Формат</li>
+            <li>Вид</li>
+            <li>Справка</li>
+        </ul>
+    </div>
+    <textarea name="content" id="content" cols="30" rows="10"></textarea>
+</div>
+<input style="display: none;" type="file" id="file" name="file"/>
+<script type="text/javascript" src="//code.jquery.com/jquery-2.1.0.min.js"></script>
+<script type="text/javascript" src="js/main.js"></script>
+</body>
+</html>

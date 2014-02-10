@@ -1,0 +1,108 @@
+/**
+ * 
+ * User: Alexander
+ * Date: 11.02.14 0:11
+ */
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    cursor: default;
+}
+
+div {
+    padding: 0;
+    margin: 0;
+}
+
+#notepad {
+    border: 8px solid #DEA56F;
+    border-top-width: 1px;
+    height: 500px;
+    width: 500px;
+    background: #f6f6f6;
+    margin: auto;
+}
+
+#header {
+    padding-bottom: 9px;
+    background: #DEA56F;
+}
+
+#header:after {
+    clear: both;
+    display: table;
+    content: "";
+}
+
+#title {
+    text-align: center;
+    float: left;
+    font-size: 15px;
+    margin-top: 3px;
+    width: 310px;
+}
+
+#min {
+    text-align: center;
+    float: right;
+    width: 25px;
+    height: 20px;
+    font-size: 14px;
+    font-family: Verdana;
+}
+
+#max {
+    text-align: center;
+    float: right;
+    width: 25px;
+    height: 20px;
+    font-size: 16px;
+    font-family: Verdana;
+}
+
+#close {
+    background: #C75050;
+    text-align: center;
+    float: right;
+    width: 45px;
+    height: 20px;
+    font-size: 14px;
+    color: white;
+    font-family: Verdana;
+}
+
+#icon {
+    width: 20px;
+    height: 20px;
+}
+
+#iconBlock {
+    width: 95px;
+    float: left;
+    height: 20px;
+}
+
+#content {
+    height: 447px;
+    width: 493px;
+    font-size: 14px;
+    padding: 2px 0 0 5px;
+    font-family: Consolas, "Lucida Grande", Arial, Helvetica, Verdana, sans-serif;
+    margin: 0;
+}
+
+#menu {
+    margin-bottom: 5px;
+}
+
+#menu ul {
+    list-style: none;
+    display: inline;
+}
+
+#menu ul li {
+    float: left;
+    padding: 2px 5px 2px 5px;
+}
