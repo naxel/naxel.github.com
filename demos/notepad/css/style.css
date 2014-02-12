@@ -97,12 +97,44 @@ div {
     margin-bottom: 5px;
 }
 
-#menu ul {
+#menu > ul {
     list-style: none;
     display: inline;
 }
 
-#menu ul li {
+#menu .mainMenuEl {
     float: left;
     padding: 2px 5px 2px 5px;
+    border: 1px solid #f6f6f6;
+}
+
+#menu .mainMenuEl:hover, #menu .mainMenuEl.selected {
+    background: #B7D8F9;
+    border: 1px solid #62A3E5;
+}
+
+
+#fileMenu {
+    position: absolute;
+    list-style: none;
+    margin-top: 3px;
+    background: #f6f6f6;
+    padding: 0;
+    border: 1px solid #ccc;
+    margin-left: -5px;
+    display: none;
+}
+
+#fileMenu.selected{
+    display: block;
+}
+
+.subMenuEl {
+    padding: 3px 15px 3px 15px;
+    border: 1px solid #f6f6f6;
+}
+
+.subMenuEl:hover {
+    background: #D1E2F2;
+    border: 1px solid #78AEE5;
 }

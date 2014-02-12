@@ -9,12 +9,16 @@ var line = 0;
 var $content;
 var $notepad;
 var $title;
+var $fileMenu;
+var $fileMenuButton;
 
 $(function() {
 
     $content = $('#content');
     $notepad = $('#notepad');
     $title = $('#title');
+    $fileMenu = $('#fileMenu');
+    $fileMenuButton = $('#fileMenuButton');
 
     $.get('content.txt', {}, function(data) {
         var tempArray = data.split('\n');
@@ -35,6 +39,22 @@ $(function() {
             $content.val('');
             line = 0;
         }
+    });
+
+    $fileMenuButton.click(function(e) {
+        stopPropagation(e);
+        if ($fileMenuButton.hasClass('selected')) {
+            $fileMenuButton.removeClass('selected');
+            $fileMenu.removeClass('selected');
+        } else {
+            $fileMenuButton.addClass('selected');
+            $fileMenu.addClass('selected');
+        }
+    });
+
+    //Remove selections
+    $(document).on("click", function() {
+        $notepad.find('.selected').removeClass('selected');
     });
 
 
@@ -72,3 +92,12 @@ $(function() {
     });
 
 });
+
+//Cancelling event
+function stopPropagation(e) {
+    if (e.stopPropagation) {
+        e.stopPropagation()
+    } else {
+        e.cancelBubble = true
+    }
+}
