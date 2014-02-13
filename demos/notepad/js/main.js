@@ -12,6 +12,8 @@ var $title;
 var $fileMenu;
 var $fileMenuButton;
 
+var maxFileSize = 2048000;
+
 $(function() {
 
     $content = $('#content');
@@ -29,6 +31,31 @@ $(function() {
     });
 
 
+    buildRecentlyMenu();
+
+    $notepad.on('click', '.savedFile', function() {
+        var $el = $(this);
+        var encodedFileName = encodeURIComponent($el.text());
+        var savedFiles = storage.getStorageData();
+        if (savedFiles) {
+            for (var fileName in savedFiles) {
+                if (encodedFileName === fileName) {
+                    var fileContent = savedFiles[fileName];
+                    contentArray = [];
+                    var tempArray = fileContent.split('\n');
+                    for (var i in tempArray) {
+                        contentArray = contentArray.concat(tempArray[i].match(/\s*\S*/g));
+                        contentArray[contentArray.length - 1] = "\n";
+                    }
+                    line = 0;
+                    $('#content').val('');
+                    break;
+                }
+            }
+        }
+    });
+
+
     $content.keydown(function(e) {
         e.preventDefault();
         if (contentArray[line] !== undefined) {
@@ -41,8 +68,7 @@ $(function() {
         }
     });
 
-    $fileMenuButton.click(function(e) {
-        stopPropagation(e);
+    $fileMenuButton.click(function() {
         if ($fileMenuButton.hasClass('selected')) {
             $fileMenuButton.removeClass('selected');
             $fileMenu.removeClass('selected');
@@ -53,8 +79,10 @@ $(function() {
     });
 
     //Remove selections
-    $(document).on("click", function() {
-        $notepad.find('.selected').removeClass('selected');
+    $(document).on("click", function(e) {
+        if (!$(e.target).hasClass('selected') && $(e.target).parents('.selected').length === 0) {
+            $notepad.find('.selected').removeClass('selected');
+        }
     });
 
 
@@ -73,9 +101,30 @@ $(function() {
 
 
     $('#file').change(function(evt) {
+
+        //Reset selection
+        $(document).click();
+
         var reader = new FileReader();
         // Closure to capture the file information.
         reader.onload = (function(theFile) {
+            //Check type
+            if (theFile.type !== "text/plain"
+                && theFile.type !== "application/javascript"
+                && theFile.type !== "text/css"
+                && theFile.type !== "text/html"
+                && theFile.type !== ""
+                ) {
+                alert('Incorrect file type "' + theFile.type + '". Allow only plain text.');
+                return;
+            }
+
+            //Check size
+            if (theFile.size > maxFileSize) {
+                alert('Too big file.');
+                return;
+            }
+
             return function(e) {
                 contentArray = [];
                 var tempArray = e.target.result.split('\n');
@@ -83,9 +132,24 @@ $(function() {
                     contentArray = contentArray.concat(tempArray[i].match(/\s*\S*/g));
                     contentArray[contentArray.length - 1] = "\n";
                 }
+
+                //Save
+                var savedFiles = storage.getStorageData();
+                if (savedFiles) {
+                    savedFiles[encodeURIComponent(theFile.name)] = e.target.result;
+                    storage.setStorageData(savedFiles);
+                } else {
+                    savedFiles = {};
+                    savedFiles[encodeURIComponent(theFile.name)] = e.target.result;
+                    storage.setStorageData(savedFiles);
+                }
+
+                buildRecentlyMenu();
                 line = 0;
                 $('#content').val('');
             };
+
+
         })(evt.target.files[0]);
         // Read in the file as a data URL.
         reader.readAsText(evt.target.files[0], 'utf-8');
@@ -93,11 +157,37 @@ $(function() {
 
 });
 
-//Cancelling event
-function stopPropagation(e) {
-    if (e.stopPropagation) {
-        e.stopPropagation()
-    } else {
-        e.cancelBubble = true
+function buildRecentlyMenu() {
+    $('.savedFile').remove();
+    var savedFiles = storage.getStorageData();
+    if (savedFiles) {
+        var html = '';
+        for (var fileName in savedFiles) {
+            html += '<li class="subMenuEl savedFile">' + decodeURIComponent(fileName) + '</li>';
+        }
+        $('#openFile').after(html);
     }
 }
+
+var storage = ({
+    storageName: 'notepad',
+    defaultData: [],
+    getStorageData: function() {
+        var storage = window.localStorage.getItem(this.storageName);
+        if (storage) {
+            return JSON.parse(storage);
+        } else {
+            return false;
+        }
+    },
+    setStorageData: function(data) {
+        window.localStorage.setItem(this.storageName, JSON.stringify(data));
+    },
+    setDefaultStorageData: function() {
+        this.setStorageData(this.defaultData);
+    },
+    removeStorageData: function() {
+        window.localStorage.removeItem(this.storageName);
+    }
+
+});
