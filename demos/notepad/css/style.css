@@ -62,6 +62,11 @@ div {
     font-family: Verdana;
 }
 
+#max:hover, #min:hover {
+    background: #3665B3;
+    color: #FFFFFF;
+}
+
 #close {
     background: #C75050;
     text-align: center;
@@ -71,6 +76,10 @@ div {
     font-size: 14px;
     color: white;
     font-family: Verdana;
+}
+
+#close:hover {
+    background: #EE5050;
 }
 
 #icon {
@@ -113,7 +122,6 @@ div {
     border: 1px solid #62A3E5;
 }
 
-
 #fileMenu {
     position: absolute;
     list-style: none;
@@ -125,7 +133,7 @@ div {
     display: none;
 }
 
-#fileMenu.selected{
+#fileMenu.selected {
     display: block;
 }
 
@@ -137,4 +145,13 @@ div {
 .subMenuEl:hover {
     background: #D1E2F2;
     border: 1px solid #78AEE5;
+}
+
+.subMenuEl.disabled {
+    color: #999;
+}
+
+.subMenuEl.disabled:hover {
+    background: #dddddd;
+    border: 1px solid #999999;
 }

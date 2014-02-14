@@ -102,9 +102,6 @@ $(function() {
 
     $('#file').change(function(evt) {
 
-        //Reset selection
-        $(document).click();
-
         var reader = new FileReader();
         // Closure to capture the file information.
         reader.onload = (function(theFile) {
@@ -153,6 +150,10 @@ $(function() {
         })(evt.target.files[0]);
         // Read in the file as a data URL.
         reader.readAsText(evt.target.files[0], 'utf-8');
+    });
+
+    $('.disabled').click(function(e) {
+        e.stopPropagation();
     });
 
 });
