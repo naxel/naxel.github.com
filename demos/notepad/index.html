@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>Notepad</title>
     <link href="css/style.css" rel="stylesheet" media="all">
+    <link href="css/notepad_en.css" rel="stylesheet" media="all">
 </head>
 <body>
 <div id="notepad">
@@ -14,7 +15,7 @@
 
 
         <div id="title">
-            <span id="name">Безымянный ― Блокнот</span>
+            <span id="name"></span>
         </div>
         <div id="close">x</div>
 
@@ -24,16 +25,16 @@
     <div id="menu">
         <ul>
             <li class="mainMenuEl" id="fileMenuButton">
-                <span>Файл</span>
+                <span id="mainMenuLabelFile"></span>
                 <ul id="fileMenu">
-                    <li class="subMenuEl" id="openFile">Открыть...</li>
-                    <li class="subMenuEl disabled">Выход</li>
+                    <li class="subMenuEl" id="openFile"></li>
+                    <li class="subMenuEl disabled" id="fileMenuLabelExit"></li>
                 </ul>
             </li>
-            <li class="mainMenuEl">Правка</li>
-            <li class="mainMenuEl">Формат</li>
-            <li class="mainMenuEl">Вид</li>
-            <li class="mainMenuEl">Справка</li>
+            <li class="mainMenuEl" id="mainMenuLabelEdit"></li>
+            <li class="mainMenuEl" id="mainMenuLabelFormat"></li>
+            <li class="mainMenuEl" id="mainMenuLabelView"></li>
+            <li class="mainMenuEl" id="mainMenuLabelHelp"></li>
         </ul>
     </div>
     <textarea name="content" id="content" cols="30" rows="10"></textarea>

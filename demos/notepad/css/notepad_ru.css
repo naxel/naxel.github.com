@@ -1,0 +1,36 @@
+/**
+ * 
+ * User: Alexander
+ * Date: 15.02.14 14:54
+ */
+#name:after {
+    content: 'Безымянный ― Блокнот';
+}
+
+#mainMenuLabelHelp:after {
+    content: 'Справка';
+}
+
+#mainMenuLabelEdit:after {
+    content: 'Правка';
+}
+
+#mainMenuLabelFormat:after {
+    content: 'Формат';
+}
+
+#mainMenuLabelView:after {
+    content: 'Вид';
+}
+
+#mainMenuLabelFile:after {
+    content: 'Файл';
+}
+
+#fileMenuLabelExit:after {
+    content: 'Выход';
+}
+
+#openFile:after {
+    content: 'Открыть...';
+}

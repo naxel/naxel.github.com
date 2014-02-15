@@ -1,0 +1,36 @@
+/**
+ * 
+ * User: Alexander
+ * Date: 15.02.14 15:01
+ */
+#name:after {
+    content: 'Untitled ― Notepad';
+}
+
+#mainMenuLabelHelp:after {
+    content: 'Help';
+}
+
+#mainMenuLabelEdit:after {
+    content: 'Edit';
+}
+
+#mainMenuLabelFormat:after {
+    content: 'Format';
+}
+
+#mainMenuLabelView:after {
+    content: 'View';
+}
+
+#mainMenuLabelFile:after {
+    content: 'File';
+}
+
+#fileMenuLabelExit:after {
+    content: 'Exit';
+}
+
+#openFile:after {
+    content: 'Open...';
+}

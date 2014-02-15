@@ -158,6 +158,29 @@ $(function() {
 
 });
 
+function loadCssFile(filename) {
+
+    var link = document.createElement("link");
+    link.setAttribute("rel", "stylesheet");
+    link.setAttribute("type", "text/css");
+    link.setAttribute("href", filename);
+
+    if (typeof link != "undefined") {
+        document.getElementsByTagName("head")[0].appendChild(link);
+    }
+}
+
+(function loadTranslatedCss() {
+    var language = (navigator.language) ? navigator.language : navigator.userLanguage;
+    if (language.search(/ru/) !== -1) {
+        loadCssFile("css/notepad_ru.css");
+    } else if (language.search(/ua/) !== -1) {
+        loadCssFile("css/notepad_ru.css");
+    } else {
+        loadCssFile("css/notepad_en.css");
+    }
+})();
+
 function buildRecentlyMenu() {
     $('.savedFile').remove();
     var savedFiles = storage.getStorageData();
