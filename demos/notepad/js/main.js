@@ -172,9 +172,9 @@ function loadCssFile(filename) {
 
 (function loadTranslatedCss() {
     var language = (navigator.language) ? navigator.language : navigator.userLanguage;
-    if (language.search(/ru/) !== -1) {
+    if (language.search(/ru/i) !== -1) {
         loadCssFile("css/notepad_ru.css");
-    } else if (language.search(/ua/) !== -1) {
+    } else if (language.search(/ua/i) !== -1) {
         loadCssFile("css/notepad_ru.css");
     } else {
         loadCssFile("css/notepad_en.css");
