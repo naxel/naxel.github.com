@@ -11,6 +11,8 @@ var $notepad;
 var $title;
 var $fileMenu;
 var $fileMenuButton;
+var $viewMenu;
+var $viewMenuButton;
 
 var maxFileSize = 2048000;
 
@@ -20,7 +22,9 @@ $(function() {
     $notepad = $('#notepad');
     $title = $('#title');
     $fileMenu = $('#fileMenu');
-    $fileMenuButton = $('#fileMenuButton');
+    $fileMenuButton = $('#mainMenuLabelFile');
+    $viewMenu = $('#viewMenu');
+    $viewMenuButton = $('#mainMenuLabelView');
 
     $.get('content.txt', {}, function(data) {
         var tempArray = data.split('\n');
@@ -70,12 +74,31 @@ $(function() {
 
     $fileMenuButton.click(function() {
         if ($fileMenuButton.hasClass('selected')) {
-            $fileMenuButton.removeClass('selected');
-            $fileMenu.removeClass('selected');
+            $notepad.find('.selected').removeClass('selected');
         } else {
+            $notepad.find('.selected').removeClass('selected');
             $fileMenuButton.addClass('selected');
             $fileMenu.addClass('selected');
         }
+    });
+
+    $viewMenuButton.click(function() {
+        if ($viewMenuButton.hasClass('selected')) {
+            $notepad.find('.selected').removeClass('selected');
+        } else {
+            $notepad.find('.selected').removeClass('selected');
+            $viewMenuButton.addClass('selected');
+            $viewMenu.addClass('selected');
+        }
+    });
+
+    //Change locale
+    $('#changeViewToEn').click(function() {
+        loadCssFile("css/notepad_en.css");
+    });
+
+    $('#changeViewToRu').click(function() {
+        loadCssFile("css/notepad_ru.css");
     });
 
     //Remove selections

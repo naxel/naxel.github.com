@@ -122,18 +122,18 @@ div {
     border: 1px solid #62A3E5;
 }
 
-#fileMenu {
+#fileMenu, #viewMenu {
     position: absolute;
     list-style: none;
-    margin-top: 3px;
+    margin-top: 17px;
     background: #f6f6f6;
     padding: 0;
     border: 1px solid #ccc;
-    margin-left: -5px;
+    margin-left: -6px;
     display: none;
 }
 
-#fileMenu.selected {
+#fileMenu.selected, #viewMenu.selected {
     display: block;
 }
 
