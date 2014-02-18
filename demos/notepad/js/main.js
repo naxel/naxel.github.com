@@ -16,7 +16,7 @@ var $viewMenuButton;
 
 var maxFileSize = 2048000;
 
-$(function() {
+$(function () {
 
     $content = $('#content');
     $notepad = $('#notepad');
@@ -26,7 +26,7 @@ $(function() {
     $viewMenu = $('#viewMenu');
     $viewMenuButton = $('#mainMenuLabelView');
 
-    $.get('content.txt', {}, function(data) {
+    $.get('content.txt', {}, function (data) {
         var tempArray = data.split('\n');
         for (var i in tempArray) {
             contentArray = contentArray.concat(tempArray[i].match(/\s*\S*/g));
@@ -37,7 +37,7 @@ $(function() {
 
     buildRecentlyMenu();
 
-    $notepad.on('click', '.savedFile', function() {
+    $notepad.on('click', '.savedFile', function () {
         var $el = $(this);
         var encodedFileName = encodeURIComponent($el.text());
         var savedFiles = storage.getStorageData();
@@ -60,7 +60,7 @@ $(function() {
     });
 
 
-    $content.keydown(function(e) {
+    $content.keydown(function (e) {
         e.preventDefault();
         if (contentArray[line] !== undefined) {
             $content.val($('#content').val() + contentArray[line])
@@ -72,7 +72,7 @@ $(function() {
         }
     });
 
-    $fileMenuButton.click(function() {
+    $fileMenuButton.click(function () {
         if ($fileMenuButton.hasClass('selected')) {
             $notepad.find('.selected').removeClass('selected');
         } else {
@@ -82,7 +82,7 @@ $(function() {
         }
     });
 
-    $viewMenuButton.click(function() {
+    $viewMenuButton.click(function () {
         if ($viewMenuButton.hasClass('selected')) {
             $notepad.find('.selected').removeClass('selected');
         } else {
@@ -93,27 +93,27 @@ $(function() {
     });
 
     //Change locale
-    $('#changeViewToEn').click(function() {
-        loadCssFile("css/notepad_en.css");
+    $('#changeViewToEn').click(function () {
+        $('body').removeClass('notepad_ru').addClass('notepad_en');
     });
 
-    $('#changeViewToRu').click(function() {
-        loadCssFile("css/notepad_ru.css");
+    $('#changeViewToRu').click(function () {
+        $('body').removeClass('notepad_en').addClass('notepad_ru');
     });
 
     //Remove selections
-    $(document).on("click", function(e) {
+    $(document).on("click", function (e) {
         if (!$(e.target).hasClass('selected') && $(e.target).parents('.selected').length === 0) {
             $notepad.find('.selected').removeClass('selected');
         }
     });
 
 
-    $('#openFile').click(function() {
+    $('#openFile').click(function () {
         $('#file').click();
     });
 
-    $('#max').click(function() {
+    $('#max').click(function () {
         $notepad.outerWidth($(window).width());
         $content.outerWidth($notepad.width());
         $title.outerWidth($notepad.width() - 190);
@@ -123,11 +123,11 @@ $(function() {
     });
 
 
-    $('#file').change(function(evt) {
+    $('#file').change(function (evt) {
 
         var reader = new FileReader();
         // Closure to capture the file information.
-        reader.onload = (function(theFile) {
+        reader.onload = (function (theFile) {
             //Check type
             if (theFile.type !== "text/plain"
                 && theFile.type !== "application/javascript"
@@ -145,7 +145,7 @@ $(function() {
                 return;
             }
 
-            return function(e) {
+            return function (e) {
                 contentArray = [];
                 var tempArray = e.target.result.split('\n');
                 for (var i in tempArray) {
@@ -175,36 +175,25 @@ $(function() {
         reader.readAsText(evt.target.files[0], 'utf-8');
     });
 
-    $('.disabled').click(function(e) {
+    $('.disabled').click(function (e) {
         e.stopPropagation();
     });
 
 });
 
-function loadCssFile(filename) {
 
-    var link = document.createElement("link");
-    link.setAttribute("rel", "stylesheet");
-    link.setAttribute("type", "text/css");
-    link.setAttribute("href", filename);
-
-    if (typeof link != "undefined") {
-        document.getElementsByTagName("head")[0].appendChild(link);
-    }
-}
-
-(function loadTranslatedCss() {
+(function loadTranslatedCss () {
     var language = (navigator.language) ? navigator.language : navigator.userLanguage;
     if (language.search(/ru/i) !== -1) {
-        loadCssFile("css/notepad_ru.css");
+        $('body').removeClass('notepad_en').addClass('notepad_ru');
     } else if (language.search(/ua/i) !== -1) {
-        loadCssFile("css/notepad_ru.css");
+        $('body').removeClass('notepad_en').addClass('notepad_ru');
     } else {
-        loadCssFile("css/notepad_en.css");
+        $('body').removeClass('notepad_ru').addClass('notepad_en');
     }
 })();
 
-function buildRecentlyMenu() {
+function buildRecentlyMenu () {
     $('.savedFile').remove();
     var savedFiles = storage.getStorageData();
     if (savedFiles) {
@@ -219,7 +208,7 @@ function buildRecentlyMenu() {
 var storage = ({
     storageName: 'notepad',
     defaultData: [],
-    getStorageData: function() {
+    getStorageData: function () {
         var storage = window.localStorage.getItem(this.storageName);
         if (storage) {
             return JSON.parse(storage);
@@ -227,14 +216,13 @@ var storage = ({
             return false;
         }
     },
-    setStorageData: function(data) {
+    setStorageData: function (data) {
         window.localStorage.setItem(this.storageName, JSON.stringify(data));
     },
-    setDefaultStorageData: function() {
+    setDefaultStorageData: function () {
         this.setStorageData(this.defaultData);
     },
-    removeStorageData: function() {
+    removeStorageData: function () {
         window.localStorage.removeItem(this.storageName);
     }
-
 });

@@ -3,34 +3,34 @@
  * User: Alexander
  * Date: 15.02.14 15:01
  */
-#name:after {
+.notepad_en #name:after {
     content: 'Untitled ― Notepad';
 }
 
-#mainMenuLabelHelp:after {
+.notepad_en #mainMenuLabelHelp:after {
     content: 'Help';
 }
 
-#mainMenuLabelEdit:after {
+.notepad_en #mainMenuLabelEdit:after {
     content: 'Edit';
 }
 
-#mainMenuLabelFormat:after {
+.notepad_en #mainMenuLabelFormat:after {
     content: 'Format';
 }
 
-#mainMenuLabelView:after {
+.notepad_en #mainMenuLabelView:after {
     content: 'View';
 }
 
-#mainMenuLabelFile:after {
+.notepad_en #mainMenuLabelFile:after {
     content: 'File';
 }
 
-#fileMenuLabelExit:after {
+.notepad_en #fileMenuLabelExit:after {
     content: 'Exit';
 }
 
-#openFile:after {
+.notepad_en #openFile:after {
     content: 'Open...';
 }

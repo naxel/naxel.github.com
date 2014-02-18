@@ -3,34 +3,34 @@
  * User: Alexander
  * Date: 15.02.14 14:54
  */
-#name:after {
+.notepad_ru #name:after {
     content: 'Безымянный ― Блокнот';
 }
 
-#mainMenuLabelHelp:after {
+.notepad_ru #mainMenuLabelHelp:after {
     content: 'Справка';
 }
 
-#mainMenuLabelEdit:after {
+.notepad_ru #mainMenuLabelEdit:after {
     content: 'Правка';
 }
 
-#mainMenuLabelFormat:after {
+.notepad_ru #mainMenuLabelFormat:after {
     content: 'Формат';
 }
 
-#mainMenuLabelView:after {
+.notepad_ru #mainMenuLabelView:after {
     content: 'Вид';
 }
 
-#mainMenuLabelFile:after {
+.notepad_ru #mainMenuLabelFile:after {
     content: 'Файл';
 }
 
-#fileMenuLabelExit:after {
+.notepad_ru #fileMenuLabelExit:after {
     content: 'Выход';
 }
 
-#openFile:after {
+.notepad_ru #openFile:after {
     content: 'Открыть...';
 }
