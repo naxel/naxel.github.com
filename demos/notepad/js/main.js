@@ -13,6 +13,8 @@ var $fileMenu;
 var $fileMenuButton;
 var $viewMenu;
 var $viewMenuButton;
+var $changeViewToRu;
+var $changeViewToEn;
 
 var maxFileSize = 2048000;
 
@@ -25,6 +27,8 @@ $(function () {
     $fileMenuButton = $('#mainMenuLabelFile');
     $viewMenu = $('#viewMenu');
     $viewMenuButton = $('#mainMenuLabelView');
+    $changeViewToRu = $('#changeViewToRu');
+    $changeViewToEn = $('#changeViewToEn');
 
     $.get('content.txt', {}, function (data) {
         var tempArray = data.split('\n');
@@ -93,11 +97,15 @@ $(function () {
     });
 
     //Change locale
-    $('#changeViewToEn').click(function () {
+    $changeViewToEn.click(function () {
+        $(this).addClass('disabled');
+        $changeViewToRu.removeClass('disabled');
         $('body').removeClass('notepad_ru').addClass('notepad_en');
     });
 
-    $('#changeViewToRu').click(function () {
+    $changeViewToRu.click(function () {
+        $(this).addClass('disabled');
+        $changeViewToEn.removeClass('disabled');
         $('body').removeClass('notepad_en').addClass('notepad_ru');
     });
 
@@ -186,10 +194,13 @@ $(function () {
     var language = (navigator.language) ? navigator.language : navigator.userLanguage;
     if (language.search(/ru/i) !== -1) {
         $('body').removeClass('notepad_en').addClass('notepad_ru');
+        $('#changeViewToRu').addClass('disabled');
     } else if (language.search(/ua/i) !== -1) {
         $('body').removeClass('notepad_en').addClass('notepad_ru');
+        $('#changeViewToRu').addClass('disabled');
     } else {
         $('body').removeClass('notepad_ru').addClass('notepad_en');
+        $('#changeViewToEn').addClass('disabled');
     }
 })();
 
