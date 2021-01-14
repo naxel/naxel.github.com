@@ -161,8 +161,7 @@
   // 4917 6100 0000 0000s
   // 03/2030
   // 737
-  let dropin;
-  window.dropin = checkout.create('dropin', {
+  const dropin1 = checkout.create('dropin', {
     paymentMethodsConfiguration: {
       card: { // Example optional configuration for Cards
         hasHolderName: false,
