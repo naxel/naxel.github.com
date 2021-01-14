@@ -107,76 +107,76 @@
     }
   }
   // const axios = require('axios').default;
-  const makePayment = async (params) => {
-    const url = "https://checkout-test.adyen.com/v49/payments"
+//   const makePayment = async (params) => {
+//     const url = "https://checkout-test.adyen.com/v49/payments"
 
-    const data = {
-      ...params,
-      "amount": {
-        "currency": "USD",
-        "value": 1000
-      },
-      "reference": "YOUR_ORDER_NUMBER",
-      "additionalData": {
-        "allow3DS2": true
-      },
-      "accountInfo": {
-        "accountCreationDate": "2019-01-17T13:42:40+01:00"
-      },
-      "billingAddress": {
-        "country": "US",
-        "city": "New York",
-        "street": "Redwood Block",
-        "houseNumberOrName": "37C",
-        "stateOrProvince": "NY",
-        "postalCode": "10039"
-      },
-      "shopperEmail": "s.hopper@test.com",
-      "shopperIP": "192.0.2.1",
-      "channel": "web",
-      "origin": "https://naxel.github.com/adyen/index.html",
-      "returnUrl": "https://naxel.github.com/adyen/index.html",
-      "merchantAccount": "VembaliABECOM"
-    };
+//     const data = {
+//       ...params,
+//       "amount": {
+//         "currency": "USD",
+//         "value": 1000
+//       },
+//       "reference": "YOUR_ORDER_NUMBER",
+//       "additionalData": {
+//         "allow3DS2": true
+//       },
+//       "accountInfo": {
+//         "accountCreationDate": "2019-01-17T13:42:40+01:00"
+//       },
+//       "billingAddress": {
+//         "country": "US",
+//         "city": "New York",
+//         "street": "Redwood Block",
+//         "houseNumberOrName": "37C",
+//         "stateOrProvince": "NY",
+//         "postalCode": "10039"
+//       },
+//       "shopperEmail": "s.hopper@test.com",
+//       "shopperIP": "192.0.2.1",
+//       "channel": "web",
+//       "origin": "https://naxel.github.com/adyen/index.html",
+//       "returnUrl": "https://naxel.github.com/adyen/index.html",
+//       "merchantAccount": "VembaliABECOM"
+//     };
 
-    console.log(JSON.stringify(data))
-    let paymentResult = await axios.post(
-      url,
-      data,
-      {
-        headers: headers
-      }
-    );
+//     console.log(JSON.stringify(data))
+//     let paymentResult = await axios.post(
+//       url,
+//       data,
+//       {
+//         headers: headers
+//       }
+//     );
 
-    return paymentResult;
-  }
-  const sendPostMessage = (data) => {
-    let postMessage = window.parent.postMessage;
-    if (window.ReactNativeWebView) {
-      window.ReactNativeWebView.postMessage(JSON.stringify(data))
-    } else {
-      postMessage(JSON.stringify(data));
-    }
-  }
+//     return paymentResult;
+//   }
+//   const sendPostMessage = (data) => {
+//     let postMessage = window.parent.postMessage;
+//     if (window.ReactNativeWebView) {
+//       window.ReactNativeWebView.postMessage(JSON.stringify(data))
+//     } else {
+//       postMessage(JSON.stringify(data));
+//     }
+//   }
 
-  const makeDetailsCall = async (data) => {
-    const url = "https://checkout-test.adyen.com/v49/payments/details"
-    console.log(JSON.stringify(data))
-    let paymentResult = await axios.post(
-      url,
-      data,
-      {
-        headers: headers
-      }
-    );
-    return paymentResult;
-  }
+//   const makeDetailsCall = async (data) => {
+//     const url = "https://checkout-test.adyen.com/v49/payments/details"
+//     console.log(JSON.stringify(data))
+//     let paymentResult = await axios.post(
+//       url,
+//       data,
+//       {
+//         headers: headers
+//       }
+//     );
+//     return paymentResult;
+//   }
 
   // Visa
   // 4917 6100 0000 0000s
   // 03/2030
   // 737
-  const dropin1 = checkout.create('dropin', {
+  const dropin = checkout.create('dropin', {
     paymentMethodsConfiguration: {
       card: { // Example optional configuration for Cards
         hasHolderName: false,
