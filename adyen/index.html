@@ -33,7 +33,7 @@
     <div id="stored-card"></div>
 </div>
 <script>
-  /*const paymentMethodsResponse = {
+  const paymentMethodsResponse = {
     "groups": [
       {
         "name": "Credit Card",
@@ -90,6 +90,21 @@
   let headers = {
     "X-API-key": "AQEkhmfuXNWTK0Qc+iSGl2k6puiSaam+J9MLEzybEeiydwSKYLyBEMFdWw2+5HzctViMSCJMYAc=-YypAZkyKn/BNTbOn2zi8UgwD+3f1mAFzV0d8qABLcaY=-xI3>uc6.UQ@p~b>g",
     "content-type": "application/json"
+  }
+   const sendPostMessage = (data) => {
+    let postMessage = window.parent.postMessage;
+    if (window.ReactNativeWebView) {
+      window.ReactNativeWebView.postMessage(JSON.stringify(data))
+    } else {
+      postMessage(JSON.stringify(data));
+    }
+  }  
+  const handleAction = async (data) => {
+    try{
+        dropin.handleAction(data);
+    }catch (e) {
+        sendPostMessage({error3: e.message});
+    }
   }
   // const axios = require('axios').default;
   const makePayment = async (params) => {
@@ -173,51 +188,53 @@
     },
     onSubmit: (state, dropin) => {
       console.log("onSubmit state recieved ", state)
-      console.log(JSON.stringify(state.data))
-      if (state.data) {
-        // sendPostMessage(state.data);
-      }
-      makePayment(state.data).then(result => {
-        console.log("makePayment data recieved ", result.data)
-        return result.data;
-      }).then(response => {
-        if (response.action) {
-          // Drop-in handles the action object from the /payments response
-          dropin.handleAction(response.action);
-        } else {
-          // Your function to show the final result to the shopper
-          console.log('final result', response);
-          alert(response.resultCode)
-        }
-      }).catch(error => {
-        console.log("makePayment err", error)
-        sendPostMessage(error);
-        throw Error(error);
-      });
+        sendPostMessage({'type':'makePayment', data: state.data})
+//       console.log(JSON.stringify(state.data))
+//       if (state.data) {
+//         // sendPostMessage(state.data);
+//       }
+//       makePayment(state.data).then(result => {
+//         console.log("makePayment data recieved ", result.data)
+//         return result.data;
+//       }).then(response => {
+//         if (response.action) {
+//           // Drop-in handles the action object from the /payments response
+//           dropin.handleAction(response.action);
+//         } else {
+//           // Your function to show the final result to the shopper
+//           console.log('final result', response);
+//           alert(response.resultCode)
+//         }
+//       }).catch(error => {
+//         console.log("makePayment err", error)
+//         sendPostMessage(error);
+//         throw Error(error);
+//       });
     },
     onAdditionalDetails: (state, dropin) => {
       console.log('onAdditionalDetails', JSON.stringify(state.data))
-      makeDetailsCall(state.data).then(result => {
-        console.log("onAdditionalDetails > action ", result.data)
-        return result.data;
-      }).then(response => {
-        if (response.action) {
-          // Drop-in handles the action object from the /payments response
-          dropin.handleAction(response.action);
-        } else {
-          // Your function to show the final result to the shopper
-          console.log('final result', response);
-          alert(response.resultCode)
-        }
-      }).catch(error => {
-        console.log("onAdditionalDetails error", error)
-        throw Error(error);
-      });
+        sendPostMessage({'type':'makeDetailsCall', data:state.data})
+//       makeDetailsCall(state.data).then(result => {
+//         console.log("onAdditionalDetails > action ", result.data)
+//         return result.data;
+//       }).then(response => {
+//         if (response.action) {
+//           // Drop-in handles the action object from the /payments response
+//           dropin.handleAction(response.action);
+//         } else {
+//           // Your function to show the final result to the shopper
+//           console.log('final result', response);
+//           alert(response.resultCode)
+//         }
+//       }).catch(error => {
+//         console.log("onAdditionalDetails error", error)
+//         throw Error(error);
+//       });
     }
   })
     .mount('#dropin');
 
-*/
+
 </script>
 </body>
 
